@@ -1,0 +1,64 @@
+{
+  "app": {
+    "title": "Contact Manager"
+  },
+  "nav": {
+    "language": "Language"
+  },
+  "contacts": {
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "columns": {
+      "nom": "Last Name",
+      "prenom": "First Name",
+      "email": "Email",
+      "actions": "Actions"
+    }
+  },
+  "form": {
+    "addTitle": "Add a Contact",
+    "editTitle": "Edit Contact",
+    "nom": "Last Name",
+    "prenom": "First Name",
+    "email": "Email",
+    "dateNaissance": "Date of Birth",
+    "dateDecès": "Date of Death",
+    "pere": "Father",
+    "mere": "Mother",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "details": {
+    "title": "Contact Details",
+    "close": "Close",
+    "noParent": "Not provided"
+  },
+  "errors": {
+    "nom": {
+      "required": "Last name is required",
+      "minLength": "Last name must have at least 3 characters"
+    },
+    "prenom": {
+      "required": "First name is required",
+      "minLength": "First name must have at least 3 characters"
+    },
+    "email": {
+      "required": "Email is required",
+      "invalid": "Email address is not valid"
+    },
+    "dateNaissance": {
+      "required": "Date of birth is required"
+    },
+    "dateDecès": {
+      "beforeNaissance": "Date of death must be after date of birth"
+    },
+    "parents": {
+      "identical": "Father and mother must be different contacts"
+    },
+    "name": {
+      "duplicate": "This name already exists in the contact list"
+    }
+  }
+}

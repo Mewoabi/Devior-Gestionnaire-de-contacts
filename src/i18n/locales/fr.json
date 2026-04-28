@@ -1,0 +1,64 @@
+{
+  "app": {
+    "title": "Gestionnaire de Contacts"
+  },
+  "nav": {
+    "language": "Langue"
+  },
+  "contacts": {
+    "add": "Ajouter",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "view": "Voir",
+    "columns": {
+      "nom": "Nom",
+      "prenom": "Prénom",
+      "email": "Email",
+      "actions": "Actions"
+    }
+  },
+  "form": {
+    "addTitle": "Ajouter un contact",
+    "editTitle": "Modifier le contact",
+    "nom": "Nom",
+    "prenom": "Prénom",
+    "email": "Email",
+    "dateNaissance": "Date de naissance",
+    "dateDecès": "Date de décès",
+    "pere": "Père",
+    "mere": "Mère",
+    "save": "Enregistrer",
+    "cancel": "Annuler"
+  },
+  "details": {
+    "title": "Détails du contact",
+    "close": "Fermer",
+    "noParent": "Non renseigné"
+  },
+  "errors": {
+    "nom": {
+      "required": "Le nom est obligatoire",
+      "minLength": "Le nom doit avoir au moins 3 caractères"
+    },
+    "prenom": {
+      "required": "Le prénom est obligatoire",
+      "minLength": "Le prénom doit avoir au moins 3 caractères"
+    },
+    "email": {
+      "required": "L'email est obligatoire",
+      "invalid": "L'adresse email n'est pas valide"
+    },
+    "dateNaissance": {
+      "required": "La date de naissance est obligatoire"
+    },
+    "dateDecès": {
+      "beforeNaissance": "La date de décès doit être postérieure à la date de naissance"
+    },
+    "parents": {
+      "identical": "Le père et la mère doivent être des contacts différents"
+    },
+    "name": {
+      "duplicate": "Ce nom existe déjà dans la liste des contacts"
+    }
+  }
+}
