@@ -1,4 +1,5 @@
-// Composant principal de liste des contacts — DataGrid MUI en lecture seule avec actions par ligne
+// Composant principal de liste des contacts — DataGrid MUI en lecture seule
+// Actions par ligne : 👁 visualisation (ouvre la modale trimode) + 🗑 suppression
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
@@ -6,7 +7,6 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import type { Contact } from '../../types';
@@ -16,7 +16,6 @@ import type { Contact } from '../../types';
 interface ContactListProps {
   contacts: Contact[];
   onAdd: () => void;
-  onEdit: (contact: Contact) => void;
   onDelete: (id: string) => void;
   onView: (contact: Contact) => void;
   loading: boolean;
@@ -27,7 +26,6 @@ interface ContactListProps {
 const ContactList: React.FC<ContactListProps> = ({
   contacts,
   onAdd,
-  onEdit,
   onDelete,
   onView,
   loading,
@@ -59,8 +57,8 @@ const ContactList: React.FC<ContactListProps> = ({
       headerName: t('contacts.columns.actions'),
       sortable: false,
       filterable: false,
-      width: 150,
-      // Rendu personnalisé des boutons d'action pour chaque ligne
+      width: 110,
+      // Rendu personnalisé : icône œil (ouvre la modale en mode view) + icône poubelle
       renderCell: (params) => {
         const contact = params.row as Contact;
         return (
@@ -71,13 +69,6 @@ const ContactList: React.FC<ContactListProps> = ({
               onClick={() => onView(contact)}
             >
               <VisibilityIcon fontSize="small" />
-            </IconButton>
-            <IconButton
-              size="small"
-              aria-label={`edit-${contact.id}`}
-              onClick={() => onEdit(contact)}
-            >
-              <EditIcon fontSize="small" />
             </IconButton>
             <IconButton
               size="small"

@@ -1,4 +1,4 @@
-// Tests du composant ContactModal — formulaire d'ajout et d'édition d'un contact
+// Tests du composant ContactModal — modes ajout, édition et visualisation (trimode)
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
@@ -24,7 +24,7 @@ const availableContacts: Contact[] = [
   },
 ];
 
-const editingContact: Contact = {
+const existingContact: Contact = {
   id: '99',
   nom: 'Leroy',
   prenom: 'Claire',
@@ -32,15 +32,18 @@ const editingContact: Contact = {
   email: 'claire.leroy@email.com',
 };
 
+type ModalMode = 'add' | 'edit' | 'view';
+
 interface ContactModalProps {
   open: boolean;
   onClose: () => void;
   onSave: (data: Omit<Contact, 'id'>) => void;
   contact?: Contact | null;
   contacts: Contact[];
+  initialMode: ModalMode;
 }
 
-// Fabrique de rendu avec le fournisseur i18n
+// Fabrique de rendu avec le fournisseur i18n — mode ajout par défaut
 const renderModal = (overrides: Partial<ContactModalProps> = {}) => {
   const defaults: ContactModalProps = {
     open: true,
@@ -48,6 +51,7 @@ const renderModal = (overrides: Partial<ContactModalProps> = {}) => {
     onSave: vi.fn(),
     contact: null,
     contacts: availableContacts,
+    initialMode: 'add',
   };
   const props = { ...defaults, ...overrides };
 
@@ -67,7 +71,7 @@ describe('ContactModal', () => {
     vi.clearAllMocks();
   });
 
-  // ─── Rendu ─────────────────────────────────────────────────────────────────
+  // ─── Rendu de base ─────────────────────────────────────────────────────────
 
   it('should not render when open is false', () => {
     renderModal({ open: false });
@@ -79,41 +83,36 @@ describe('ContactModal', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
-  it('should show the "add" title when no contact is provided', () => {
-    renderModal({ contact: null });
+  it('should show the "add" title in add mode', () => {
+    renderModal({ initialMode: 'add', contact: null });
     expect(screen.getByText(/ajouter un contact/i)).toBeInTheDocument();
   });
 
-  it('should show the "edit" title when a contact is provided', () => {
-    renderModal({ contact: editingContact });
+  it('should show the "edit" title in edit mode', () => {
+    renderModal({ initialMode: 'edit', contact: existingContact });
     expect(screen.getByText(/modifier le contact/i)).toBeInTheDocument();
   });
 
   it('should render all form fields', () => {
     renderModal();
-    // Utilisation de chaînes exactes — /nom/i matcherait aussi "Prénom"
     expect(screen.getByLabelText('Nom')).toBeInTheDocument();
     expect(screen.getByLabelText('Prénom')).toBeInTheDocument();
     expect(screen.getByLabelText('Email')).toBeInTheDocument();
     expect(screen.getByLabelText('Date de naissance')).toBeInTheDocument();
   });
 
-  it('should render the Save and Cancel buttons', () => {
-    renderModal();
+  it('should render the Save and Cancel buttons in add mode', () => {
+    renderModal({ initialMode: 'add' });
     expect(screen.getByRole('button', { name: /enregistrer/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /annuler/i })).toBeInTheDocument();
   });
 
   // ─── Pré-remplissage en mode édition ───────────────────────────────────────
 
-  it('should pre-fill nom and prenom fields when editing a contact', () => {
-    renderModal({ contact: editingContact });
+  it('should pre-fill fields when in edit mode', () => {
+    renderModal({ initialMode: 'edit', contact: existingContact });
     expect(screen.getByDisplayValue('Leroy')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Claire')).toBeInTheDocument();
-  });
-
-  it('should pre-fill email when editing a contact', () => {
-    renderModal({ contact: editingContact });
     expect(screen.getByDisplayValue('claire.leroy@email.com')).toBeInTheDocument();
   });
 
@@ -128,8 +127,7 @@ describe('ContactModal', () => {
   // ─── Validation et erreurs ─────────────────────────────────────────────────
 
   it('should show validation errors when required fields are touched and empty', async () => {
-    renderModal();
-    // Simulation du blur sur les champs obligatoires pour déclencher les erreurs
+    renderModal({ initialMode: 'add' });
     fireEvent.blur(screen.getByLabelText('Nom'));
     fireEvent.blur(screen.getByLabelText('Prénom'));
     fireEvent.blur(screen.getByLabelText('Email'));
@@ -140,17 +138,13 @@ describe('ContactModal', () => {
   });
 
   it('should disable the Save button when there are validation errors', () => {
-    renderModal();
-    // Le formulaire vide contient des erreurs dès l'ouverture → bouton désactivé d'emblée
+    renderModal({ initialMode: 'add' });
     expect(screen.getByRole('button', { name: /enregistrer/i })).toBeDisabled();
   });
 
   it('should show an error when email is invalid', async () => {
-    renderModal();
-    fireEvent.change(screen.getByLabelText('Email'), {
-      target: { value: 'not-an-email' },
-    });
-    // Blur déclenche l'affichage de l'erreur pour le champ touché
+    renderModal({ initialMode: 'add' });
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'not-an-email' } });
     fireEvent.blur(screen.getByLabelText('Email'));
 
     await waitFor(() => {
@@ -161,16 +155,12 @@ describe('ContactModal', () => {
   // ─── Soumission valide ─────────────────────────────────────────────────────
 
   it('should call onSave with correct data when the form is valid', async () => {
-    const { props } = renderModal({ contacts: [] });
+    const { props } = renderModal({ initialMode: 'add', contacts: [] });
 
     fireEvent.change(screen.getByLabelText('Nom'), { target: { value: 'Moreau' } });
     fireEvent.change(screen.getByLabelText('Prénom'), { target: { value: 'Lucas' } });
-    fireEvent.change(screen.getByLabelText('Email'), {
-      target: { value: 'lucas.moreau@email.com' },
-    });
-    fireEvent.change(screen.getByLabelText('Date de naissance'), {
-      target: { value: '1995-03-10' },
-    });
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'lucas.moreau@email.com' } });
+    fireEvent.change(screen.getByLabelText('Date de naissance'), { target: { value: '1995-03-10' } });
 
     fireEvent.click(screen.getByRole('button', { name: /enregistrer/i }));
 
@@ -186,9 +176,60 @@ describe('ContactModal', () => {
   // ─── Autocomplete père/mère ────────────────────────────────────────────────
 
   it('should render the Autocomplete fields for pere and mere', () => {
-    renderModal();
-    // Les champs père et mère sont des Autocomplete avec leur label traduit
+    renderModal({ initialMode: 'add' });
     expect(screen.getByLabelText(/père/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/mère/i)).toBeInTheDocument();
+  });
+
+  // ─── Mode visualisation (view) ─────────────────────────────────────────────
+
+  it('should show the "view" title in view mode', () => {
+    renderModal({ initialMode: 'view', contact: existingContact });
+    expect(screen.getByText(/détails du contact/i)).toBeInTheDocument();
+  });
+
+  it('should pre-fill fields in view mode', () => {
+    renderModal({ initialMode: 'view', contact: existingContact });
+    expect(screen.getByDisplayValue('Leroy')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Claire')).toBeInTheDocument();
+  });
+
+  it('should disable all inputs in view mode', () => {
+    renderModal({ initialMode: 'view', contact: existingContact });
+    expect(screen.getByLabelText('Nom')).toBeDisabled();
+    expect(screen.getByLabelText('Prénom')).toBeDisabled();
+    expect(screen.getByLabelText('Email')).toBeDisabled();
+  });
+
+  it('should NOT show the Save button in view mode', () => {
+    renderModal({ initialMode: 'view', contact: existingContact });
+    expect(screen.queryByRole('button', { name: /enregistrer/i })).not.toBeInTheDocument();
+  });
+
+  it('should show the "Modifier" button in view mode', () => {
+    renderModal({ initialMode: 'view', contact: existingContact });
+    expect(screen.getByRole('button', { name: /modifier/i })).toBeInTheDocument();
+  });
+
+  it('should switch to edit mode when "Modifier" is clicked in view mode', async () => {
+    renderModal({ initialMode: 'view', contact: existingContact });
+
+    // Passage en mode édition via le bouton Modifier
+    fireEvent.click(screen.getByRole('button', { name: /modifier/i }));
+
+    await waitFor(() => {
+      // Le titre doit changer et les champs doivent devenir éditables
+      expect(screen.getByText(/modifier le contact/i)).toBeInTheDocument();
+      expect(screen.getByLabelText('Nom')).not.toBeDisabled();
+    });
+  });
+
+  it('should show the Save button after switching from view to edit mode', async () => {
+    renderModal({ initialMode: 'view', contact: existingContact });
+    fireEvent.click(screen.getByRole('button', { name: /modifier/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /enregistrer/i })).toBeInTheDocument();
+    });
   });
 });

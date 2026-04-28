@@ -1,4 +1,4 @@
-// Composant modal partagé pour l'ajout et l'édition d'un contact
+// Composant modal trimode — ajout, édition et visualisation d'un contact dans une seule fenêtre
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Dialog from '@mui/material/Dialog';
@@ -12,7 +12,9 @@ import Box from '@mui/material/Box';
 import type { Contact } from '../../types';
 import { validateContact } from '../../utils/validation';
 
-// ─── Interfaces ───────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export type ModalMode = 'add' | 'edit' | 'view';
 
 interface ContactModalProps {
   open: boolean;
@@ -20,6 +22,7 @@ interface ContactModalProps {
   onSave: (data: Omit<Contact, 'id'>) => void;
   contact?: Contact | null;
   contacts: Contact[];
+  initialMode: ModalMode;
 }
 
 interface FormState {
@@ -56,17 +59,21 @@ const ContactModal: React.FC<ContactModalProps> = ({
   onSave,
   contact,
   contacts,
+  initialMode,
 }) => {
   const { t } = useTranslation();
 
+  // currentMode est géré en interne pour permettre la transition view → edit sans fermer la modale
+  const [currentMode, setCurrentMode] = useState<ModalMode>(initialMode);
   const [form, setForm] = useState<FormState>(emptyForm);
   // Ensemble des champs qui ont reçu le focus puis été quittés (blur)
   const [touched, setTouched] = useState<Set<string>>(new Set());
-  // Passe à true lors du premier clic sur Enregistrer
-  const [submitted, setSubmitted] = useState(false);
 
-  // Synchronisation de l'état du formulaire avec le contact en cours d'édition
+  // Réinitialisation complète à chaque ouverture ou changement de contact
   useEffect(() => {
+    setCurrentMode(initialMode);
+    setTouched(new Set());
+
     if (contact) {
       setForm({
         nom: contact.nom,
@@ -80,12 +87,11 @@ const ContactModal: React.FC<ContactModalProps> = ({
     } else {
       setForm(emptyForm);
     }
-    setTouched(new Set());
-    setSubmitted(false);
-  }, [contact, open]);
+  }, [contact, open, initialMode]);
 
   // Erreurs calculées en permanence depuis l'état courant du formulaire
   const currentErrors = useMemo(() => {
+    if (currentMode === 'view') return {};
     const data: Partial<Contact> = {
       nom: form.nom,
       prenom: form.prenom,
@@ -96,11 +102,11 @@ const ContactModal: React.FC<ContactModalProps> = ({
       mere: form.mere,
     };
     return validateContact(data, contacts, contact?.id);
-  }, [form, contacts, contact]);
+  }, [form, contacts, contact, currentMode]);
 
-  // Retourne le message d'erreur d'un champ uniquement s'il a été touché ou soumis
+  // Retourne le message d'erreur d'un champ uniquement si ce champ a été touché
   const getFieldError = (field: string): string | undefined => {
-    if (!submitted && !touched.has(field)) return undefined;
+    if (!touched.has(field)) return undefined;
     return currentErrors[field];
   };
 
@@ -113,10 +119,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
   };
 
   const handleSubmit = () => {
-    setSubmitted(true);
-    // Bloque la sauvegarde si des erreurs de validation existent
     if (Object.keys(currentErrors).length > 0) return;
-
     onSave({
       nom: form.nom.trim(),
       prenom: form.prenom.trim(),
@@ -128,13 +131,19 @@ const ContactModal: React.FC<ContactModalProps> = ({
     });
   };
 
+  // Titre de la modale selon le mode courant
+  const getTitle = (): string => {
+    if (currentMode === 'view') return t('form.viewTitle');
+    if (currentMode === 'edit') return t('form.editTitle');
+    return t('form.addTitle');
+  };
+
+  const isViewMode = currentMode === 'view';
   const getContactLabel = (c: Contact) => `${c.nom} ${c.prenom}`;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        {contact ? t('form.editTitle') : t('form.addTitle')}
-      </DialogTitle>
+      <DialogTitle>{getTitle()}</DialogTitle>
 
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
@@ -149,6 +158,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             helperText={getFieldError('nom') ? (
               <span role="alert">{t(getFieldError('nom')!)}</span>
             ) : undefined}
+            disabled={isViewMode}
             fullWidth
             inputProps={{ 'aria-label': t('form.nom') }}
           />
@@ -163,6 +173,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             helperText={getFieldError('prenom') ? (
               <span role="alert">{t(getFieldError('prenom')!)}</span>
             ) : undefined}
+            disabled={isViewMode}
             fullWidth
             inputProps={{ 'aria-label': t('form.prenom') }}
           />
@@ -177,6 +188,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             helperText={getFieldError('email') ? (
               <span role="alert">{t(getFieldError('email')!)}</span>
             ) : undefined}
+            disabled={isViewMode}
             fullWidth
             inputProps={{ 'aria-label': t('form.email') }}
           />
@@ -192,6 +204,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             helperText={getFieldError('dateNaissance') ? (
               <span role="alert">{t(getFieldError('dateNaissance')!)}</span>
             ) : undefined}
+            disabled={isViewMode}
             fullWidth
             slotProps={{ inputLabel: { shrink: true } }}
             inputProps={{ 'aria-label': t('form.dateNaissance') }}
@@ -208,6 +221,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             helperText={getFieldError('dateDecès') ? (
               <span role="alert">{t(getFieldError('dateDecès')!)}</span>
             ) : undefined}
+            disabled={isViewMode}
             fullWidth
             slotProps={{ inputLabel: { shrink: true } }}
             inputProps={{ 'aria-label': t('form.dateDecès') }}
@@ -220,6 +234,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             value={form.pere}
             onChange={(_, value) => handleFieldChange('pere', value)}
             isOptionEqualToValue={(option, value) => option.id === value.id}
+            disabled={isViewMode}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -240,6 +255,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             value={form.mere}
             onChange={(_, value) => handleFieldChange('mere', value)}
             isOptionEqualToValue={(option, value) => option.id === value.id}
+            disabled={isViewMode}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -255,14 +271,24 @@ const ContactModal: React.FC<ContactModalProps> = ({
 
       <DialogActions>
         <Button onClick={onClose}>{t('form.cancel')}</Button>
-        {/* Désactivé dès qu'il y a des erreurs de validation, même avant toute soumission */}
-        <Button
-          variant="contained"
-          onClick={handleSubmit}
-          disabled={Object.keys(currentErrors).length > 0}
-        >
-          {t('form.save')}
-        </Button>
+
+        {/* Mode visualisation — bouton pour basculer en mode édition sans fermer */}
+        {isViewMode && (
+          <Button variant="contained" onClick={() => setCurrentMode('edit')}>
+            {t('form.edit')}
+          </Button>
+        )}
+
+        {/* Mode ajout / édition — bouton de sauvegarde désactivé si erreurs */}
+        {!isViewMode && (
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            disabled={Object.keys(currentErrors).length > 0}
+          >
+            {t('form.save')}
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

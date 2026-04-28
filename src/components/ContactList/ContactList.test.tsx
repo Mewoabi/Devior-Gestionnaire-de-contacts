@@ -1,4 +1,4 @@
-// Tests du composant ContactList — DataGrid en lecture seule avec boutons d'action
+// Tests du composant ContactList — DataGrid en lecture seule avec actions visualisation et suppression
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
@@ -24,10 +24,10 @@ const mockContacts: Contact[] = [
   },
 ];
 
+// onEdit supprimé — l'édition passe désormais par le mode trimode de la modale
 interface ContactListProps {
   contacts: Contact[];
   onAdd: () => void;
-  onEdit: (contact: Contact) => void;
   onDelete: (id: string) => void;
   onView: (contact: Contact) => void;
   loading: boolean;
@@ -38,7 +38,6 @@ const renderContactList = (overrides: Partial<ContactListProps> = {}) => {
   const defaults: ContactListProps = {
     contacts: mockContacts,
     onAdd: vi.fn(),
-    onEdit: vi.fn(),
     onDelete: vi.fn(),
     onView: vi.fn(),
     loading: false,
@@ -98,18 +97,12 @@ describe('ContactList', () => {
     expect(props.onAdd).toHaveBeenCalledTimes(1);
   });
 
-  // ─── Boutons d'action ─────────────────────────────────────────────────────
+  // ─── Boutons d'action (👁 vue + 🗑 suppression uniquement) ─────────────────
 
   it('should call onView with the correct contact when the view button is clicked', () => {
     const { props } = renderContactList();
     fireEvent.click(screen.getByRole('button', { name: 'view-1' }));
     expect(props.onView).toHaveBeenCalledWith(mockContacts[0]);
-  });
-
-  it('should call onEdit with the correct contact when the edit button is clicked', () => {
-    const { props } = renderContactList();
-    fireEvent.click(screen.getByRole('button', { name: 'edit-1' }));
-    expect(props.onEdit).toHaveBeenCalledWith(mockContacts[0]);
   });
 
   it('should call onDelete with the correct id when the delete button is clicked', () => {
@@ -118,11 +111,16 @@ describe('ContactList', () => {
     expect(props.onDelete).toHaveBeenCalledWith('1');
   });
 
+  // L'édition passe par la modale en mode view → edit, donc pas d'icône edit séparée
+  it('should NOT render a separate edit icon button', () => {
+    renderContactList();
+    expect(screen.queryByRole('button', { name: 'edit-1' })).not.toBeInTheDocument();
+  });
+
   // ─── État de chargement ───────────────────────────────────────────────────
 
   it('should render correctly when loading is true', () => {
     renderContactList({ loading: true, contacts: [] });
-    // Le DataGrid est toujours présent pendant le chargement
     expect(screen.getByRole('grid')).toBeInTheDocument();
   });
 

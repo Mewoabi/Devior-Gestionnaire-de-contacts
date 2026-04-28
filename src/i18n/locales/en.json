@@ -27,6 +27,8 @@
     "dateDecès": "Date of Death",
     "pere": "Father",
     "mere": "Mother",
+    "viewTitle": "Contact Details",
+    "edit": "Edit",
     "save": "Save",
     "cancel": "Cancel"
   },
