@@ -21,11 +21,14 @@ function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [initialMode, setInitialMode] = useState<ModalMode>('add');
+  // Compteur incrémenté à chaque ouverture pour forcer le remontage de la modale (état propre)
+  const [modalKey, setModalKey] = useState(0);
 
   // Ouvre la modale en mode ajout — formulaire vide
   const handleAdd = () => {
     setSelectedContact(null);
     setInitialMode('add');
+    setModalKey((k) => k + 1);
     setModalOpen(true);
   };
 
@@ -33,6 +36,7 @@ function App() {
   const handleView = (contact: Contact) => {
     setSelectedContact(contact);
     setInitialMode('view');
+    setModalKey((k) => k + 1);
     setModalOpen(true);
   };
 
@@ -81,8 +85,9 @@ function App() {
             loading={loading}
           />
 
-          {/* Modale trimode — partagée pour l'ajout, la visualisation et l'édition */}
+          {/* Modale trimode — key change force le remontage pour garantir un état propre à chaque ouverture */}
           <ContactModal
+            key={modalKey}
             open={modalOpen}
             onClose={handleClose}
             onSave={handleSave}

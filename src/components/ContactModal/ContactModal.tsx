@@ -1,5 +1,5 @@
 // Composant modal trimode — ajout, édition et visualisation d'un contact dans une seule fenêtre
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -45,13 +45,51 @@ const emptyForm: FormState = {
   mere: null,
 };
 
-// Formate une Date en chaîne YYYY-MM-DD pour les champs <input type="date">
-const formatDateForInput = (date: Date | undefined): string => {
-  if (!date || !(date instanceof Date)) return '';
-  return date.toISOString().split('T')[0];
+// Formate une Date (ou une chaîne ISO) en YYYY-MM-DD pour les champs <input type="date">
+// axios-mock-adapter v2 sérialise les Date en chaînes ISO via JSON, donc on gère les deux formes
+const formatDateForInput = (date: Date | string | undefined): string => {
+  if (!date) return '';
+  const d = date instanceof Date ? date : new Date(date as string);
+  if (isNaN(d.getTime())) return '';
+  return d.toISOString().split('T')[0];
+};
+
+// Construit l'état initial du formulaire depuis un contact existant
+const buildFormState = (contact: Contact): FormState => ({
+  nom: contact.nom,
+  prenom: contact.prenom,
+  email: contact.email,
+  dateNaissance: formatDateForInput(contact.dateNaissance),
+  dateDecès: formatDateForInput(contact.dateDecès),
+  pere: contact.pere ?? null,
+  mere: contact.mere ?? null,
+});
+
+// Wrapper de type pour le TextField dans les Autocomplete — inputProps/InputProps sont requis
+// par Autocomplete en interne mais dépréciés dans les types MUI v9
+const AutocompleteTextField = TextField as React.ComponentType<
+  React.ComponentProps<typeof TextField> & {
+    inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
+    InputProps?: object;
+  }
+>;
+
+// Extrait inputProps depuis les params de renderInput d'Autocomplete
+// MUI v9 a retiré inputProps des types mais il est toujours présent à l'exécution
+const getAutocompleteInputProps = (
+  params: unknown
+): React.InputHTMLAttributes<HTMLInputElement> & React.RefAttributes<HTMLInputElement> => {
+  if (typeof params !== 'object' || params === null || !('inputProps' in params)) {
+    return {};
+  }
+  return (
+    (params as { inputProps?: React.InputHTMLAttributes<HTMLInputElement> }).inputProps ?? {}
+  );
 };
 
 // ─── Composant ───────────────────────────────────────────────────────────────
+// Le composant est remonté à chaque ouverture via une prop key dans le parent (App.tsx),
+// ce qui garantit un état initial propre sans avoir besoin d'un useEffect de réinitialisation.
 
 const ContactModal: React.FC<ContactModalProps> = ({
   open,
@@ -63,31 +101,13 @@ const ContactModal: React.FC<ContactModalProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // currentMode est géré en interne pour permettre la transition view → edit sans fermer la modale
+  // État initialisé depuis les props au montage — le parent change la key pour forcer un remontage
   const [currentMode, setCurrentMode] = useState<ModalMode>(initialMode);
-  const [form, setForm] = useState<FormState>(emptyForm);
-  // Ensemble des champs qui ont reçu le focus puis été quittés (blur)
+  const [form, setForm] = useState<FormState>(() =>
+    contact ? buildFormState(contact) : emptyForm
+  );
+  // Ensemble des champs ayant reçu le focus puis été quittés (blur)
   const [touched, setTouched] = useState<Set<string>>(new Set());
-
-  // Réinitialisation complète à chaque ouverture ou changement de contact
-  useEffect(() => {
-    setCurrentMode(initialMode);
-    setTouched(new Set());
-
-    if (contact) {
-      setForm({
-        nom: contact.nom,
-        prenom: contact.prenom,
-        email: contact.email,
-        dateNaissance: formatDateForInput(contact.dateNaissance),
-        dateDecès: formatDateForInput(contact.dateDecès),
-        pere: contact.pere ?? null,
-        mere: contact.mere ?? null,
-      });
-    } else {
-      setForm(emptyForm);
-    }
-  }, [contact, open, initialMode]);
 
   // Erreurs calculées en permanence depuis l'état courant du formulaire
   const currentErrors = useMemo(() => {
@@ -141,6 +161,11 @@ const ContactModal: React.FC<ContactModalProps> = ({
   const isViewMode = currentMode === 'view';
   const getContactLabel = (c: Contact) => `${c.nom} ${c.prenom}`;
 
+  // Exclut le contact en cours d'édition des options père/mère — un contact ne peut pas être son propre parent
+  const parentOptions = contact
+    ? contacts.filter((c) => c.id !== contact.id)
+    : contacts;
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{getTitle()}</DialogTitle>
@@ -160,7 +185,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             ) : undefined}
             disabled={isViewMode}
             fullWidth
-            inputProps={{ 'aria-label': t('form.nom') }}
+            slotProps={{ htmlInput: { 'aria-label': t('form.nom') } }}
           />
 
           {/* Champ Prénom */}
@@ -175,7 +200,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             ) : undefined}
             disabled={isViewMode}
             fullWidth
-            inputProps={{ 'aria-label': t('form.prenom') }}
+            slotProps={{ htmlInput: { 'aria-label': t('form.prenom') } }}
           />
 
           {/* Champ Email */}
@@ -190,7 +215,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             ) : undefined}
             disabled={isViewMode}
             fullWidth
-            inputProps={{ 'aria-label': t('form.email') }}
+            slotProps={{ htmlInput: { 'aria-label': t('form.email') } }}
           />
 
           {/* Champ Date de naissance — obligatoire */}
@@ -206,8 +231,10 @@ const ContactModal: React.FC<ContactModalProps> = ({
             ) : undefined}
             disabled={isViewMode}
             fullWidth
-            slotProps={{ inputLabel: { shrink: true } }}
-            inputProps={{ 'aria-label': t('form.dateNaissance') }}
+            slotProps={{
+              inputLabel: { shrink: true },
+              htmlInput: { 'aria-label': t('form.dateNaissance') },
+            }}
           />
 
           {/* Champ Date de décès — optionnel */}
@@ -223,45 +250,47 @@ const ContactModal: React.FC<ContactModalProps> = ({
             ) : undefined}
             disabled={isViewMode}
             fullWidth
-            slotProps={{ inputLabel: { shrink: true } }}
-            inputProps={{ 'aria-label': t('form.dateDecès') }}
+            slotProps={{
+              inputLabel: { shrink: true },
+              htmlInput: { 'aria-label': t('form.dateDecès') },
+            }}
           />
 
-          {/* Sélection du père via Autocomplete */}
+          {/* Sélection du père via Autocomplete — le contact lui-même est exclu des options */}
           <Autocomplete
-            options={contacts}
+            options={parentOptions}
             getOptionLabel={getContactLabel}
             value={form.pere}
             onChange={(_, value) => handleFieldChange('pere', value)}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             disabled={isViewMode}
             renderInput={(params) => (
-              <TextField
+              <AutocompleteTextField
                 {...params}
                 label={t('form.pere')}
                 error={!!getFieldError('parents')}
                 helperText={getFieldError('parents') ? (
                   <span role="alert">{t(getFieldError('parents')!)}</span>
                 ) : undefined}
-                inputProps={{ ...params.inputProps, 'aria-label': t('form.pere') }}
+                inputProps={{ ...getAutocompleteInputProps(params), 'aria-label': t('form.pere') }}
               />
             )}
           />
 
-          {/* Sélection de la mère via Autocomplete */}
+          {/* Sélection de la mère via Autocomplete — le contact lui-même est exclu des options */}
           <Autocomplete
-            options={contacts}
+            options={parentOptions}
             getOptionLabel={getContactLabel}
             value={form.mere}
             onChange={(_, value) => handleFieldChange('mere', value)}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             disabled={isViewMode}
             renderInput={(params) => (
-              <TextField
+              <AutocompleteTextField
                 {...params}
                 label={t('form.mere')}
                 error={!!getFieldError('parents')}
-                inputProps={{ ...params.inputProps, 'aria-label': t('form.mere') }}
+                inputProps={{ ...getAutocompleteInputProps(params), 'aria-label': t('form.mere') }}
               />
             )}
           />

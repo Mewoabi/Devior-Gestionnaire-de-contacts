@@ -181,6 +181,26 @@ describe('ContactModal', () => {
     expect(screen.getByLabelText(/mère/i)).toBeInTheDocument();
   });
 
+  it('should exclude the contact being edited from the parent Autocomplete options', async () => {
+    // Édition du contact id='1' (Dupont Jean) — il ne doit pas apparaître dans ses propres options
+    renderModal({
+      initialMode: 'edit',
+      contact: availableContacts[0],
+      contacts: availableContacts,
+    });
+
+    // Ouverture de la liste déroulante du champ père
+    fireEvent.mouseDown(screen.getByLabelText(/père/i));
+
+    await waitFor(() => {
+      const options = screen.queryAllByRole('option');
+      // "Martin Sophie" (id='2') doit apparaître comme option valide
+      expect(options.some((o) => o.textContent?.includes('Martin'))).toBe(true);
+      // "Dupont Jean" (id='1') ne doit PAS apparaître — c'est le contact en cours d'édition
+      expect(options.some((o) => o.textContent?.includes('Jean'))).toBe(false);
+    });
+  });
+
   // ─── Mode visualisation (view) ─────────────────────────────────────────────
 
   it('should show the "view" title in view mode', () => {
