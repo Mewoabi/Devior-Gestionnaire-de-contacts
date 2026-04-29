@@ -10,6 +10,8 @@ import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+// Textes internes du DataGrid traduits selon la langue active (pagination, menus de colonnes…)
+import { frFR, enUS } from '@mui/x-data-grid/locales';
 import type { Contact } from '../../types';
 
 // ─── Interface des props ──────────────────────────────────────────────────────
@@ -31,7 +33,13 @@ const ContactList: React.FC<ContactListProps> = ({
   onView,
   loading,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  // Sélection du texte de localisation du DataGrid selon la langue active
+  const dataGridLocaleText =
+    i18n.language === 'fr'
+      ? frFR.components.MuiDataGrid.defaultProps.localeText
+      : enUS.components.MuiDataGrid.defaultProps.localeText;
 
   // Définition des colonnes — headerName traduit via i18n, édition désactivée sur toutes
   const columns: GridColDef[] = [
@@ -126,6 +134,7 @@ const ContactList: React.FC<ContactListProps> = ({
           pagination: { paginationModel: { pageSize: 10 } },
         }}
         checkboxSelection
+        localeText={dataGridLocaleText}
         disableRowSelectionOnClick
         autoHeight
         sx={{

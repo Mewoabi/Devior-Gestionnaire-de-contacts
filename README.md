@@ -143,6 +143,7 @@ Les erreurs s'affichent en rouge sous le champ concerné dès qu'il a été quit
 - Interface disponible en **français** (défaut) et **anglais**
 - Bascule instantanée sans rechargement de la page
 - Sélecteur intégré dans la barre de navigation
+- Le texte interne du **MUI DataGrid** est également traduit (pagination « Lignes par page », menus de colonnes « Masquer la colonne / Gérer les colonnes », etc.) grâce à la prop `localeText` alimentée par les objets de localisation `frFR` / `enUS` fournis par `@mui/x-data-grid/locales`
 
 ---
 
