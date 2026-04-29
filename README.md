@@ -123,7 +123,17 @@ contact-manager/
 - Affichage via **MUI DataGrid** en mode lecture seule (pas d'édition inline)
 - Sélection multiple par cases à cocher
 - Pagination configurable (10 / 25 / 50 lignes par page)
-- Tri par colonne
+- Tri par colonne et filtrage sur toutes les colonnes
+- **Colonnes supplémentaires masquées par défaut** — activables via le gestionnaire de colonnes (⋮) :
+
+| Colonne | Type | Affichage si absent |
+|---|---|---|
+| Date de naissance | `date` — tri chronologique | — |
+| Date de décès | `date` — tri chronologique | — |
+| Père | `string` — nom + prénom combinés | — |
+| Mère | `string` — nom + prénom combinés | — |
+
+- La colonne **Actions** est protégée : elle ne peut pas être masquée pour préserver l'accès aux contrôles de visualisation et suppression
 
 ### Validation des données (7 règles)
 

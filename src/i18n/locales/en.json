@@ -14,6 +14,10 @@
       "nom": "Last Name",
       "prenom": "First Name",
       "email": "Email",
+      "dateNaissance": "Date of Birth",
+      "dateDecès": "Date of Death",
+      "pere": "Father",
+      "mere": "Mother",
       "actions": "Actions"
     }
   },

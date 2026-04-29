@@ -41,6 +41,17 @@ const ContactList: React.FC<ContactListProps> = ({
       ? frFR.components.MuiDataGrid.defaultProps.localeText
       : enUS.components.MuiDataGrid.defaultProps.localeText;
 
+  // Locale BCP-47 utilisée pour le formatage des dates selon la langue active
+  const dateLocale = i18n.language === 'fr' ? 'fr-FR' : 'en-US';
+
+  // Convertit une valeur brute (Date ou chaîne ISO après sérialisation JSON) en objet Date ou null
+  const toDate = (value: unknown): Date | null => {
+    if (!value) return null;
+    if (value instanceof Date) return value;
+    const parsed = new Date(value as string);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  };
+
   // Définition des colonnes — headerName traduit via i18n, édition désactivée sur toutes
   const columns: GridColDef[] = [
     {
@@ -61,11 +72,57 @@ const ContactList: React.FC<ContactListProps> = ({
       flex: 1.5,
       editable: false,
     },
+    // ─── Colonnes masquées par défaut — activables via le gestionnaire de colonnes ──
+    {
+      field: 'dateNaissance',
+      headerName: t('contacts.columns.dateNaissance'),
+      type: 'date',
+      width: 160,
+      editable: false,
+      // valueGetter : renvoie un objet Date pour que le tri et le filtre soient chronologiques
+      valueGetter: (value: unknown) => toDate(value),
+      // valueFormatter : affichage localisé selon la langue active
+      valueFormatter: (value: Date | null) =>
+        value ? value.toLocaleDateString(dateLocale) : '—',
+    },
+    {
+      field: 'dateDecès',
+      headerName: t('contacts.columns.dateDecès'),
+      type: 'date',
+      width: 160,
+      editable: false,
+      valueGetter: (value: unknown) => toDate(value),
+      // Affiche « — » si le champ optionnel est absent
+      valueFormatter: (value: Date | null) =>
+        value ? value.toLocaleDateString(dateLocale) : '—',
+    },
+    {
+      field: 'pere',
+      headerName: t('contacts.columns.pere'),
+      type: 'string',
+      width: 180,
+      editable: false,
+      // Combine nom + prénom du père pour le tri alphabétique et l'affichage
+      valueGetter: (value: Contact | null | undefined) =>
+        value ? `${value.nom} ${value.prenom}` : '—',
+    },
+    {
+      field: 'mere',
+      headerName: t('contacts.columns.mere'),
+      type: 'string',
+      width: 180,
+      editable: false,
+      valueGetter: (value: Contact | null | undefined) =>
+        value ? `${value.nom} ${value.prenom}` : '—',
+    },
+    // ─── Colonne Actions — non masquable pour préserver les contrôles de la grille ──
     {
       field: 'actions',
       headerName: t('contacts.columns.actions'),
       sortable: false,
       filterable: false,
+      hideable: false,
+      disableColumnMenu: true,
       width: 120,
       align: 'center',
       headerAlign: 'center',
@@ -132,6 +189,15 @@ const ContactList: React.FC<ContactListProps> = ({
         pageSizeOptions={[10, 25, 50]}
         initialState={{
           pagination: { paginationModel: { pageSize: 10 } },
+          columns: {
+            // Colonnes supplémentaires masquées par défaut — activables via le gestionnaire
+            columnVisibilityModel: {
+              dateNaissance: false,
+              dateDecès: false,
+              pere: false,
+              mere: false,
+            },
+          },
         }}
         checkboxSelection
         localeText={dataGridLocaleText}
