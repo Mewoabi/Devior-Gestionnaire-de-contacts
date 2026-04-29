@@ -23,7 +23,14 @@
   },
   "form": {
     "addTitle": "Ajouter un contact",
+    "addSubtitle": "Saisissez l'identité, les dates et les parents éventuels.",
     "editTitle": "Modifier le contact",
+    "editSubtitle": "Modifiez les champs ci-dessous, puis enregistrez.",
+    "viewTitle": "Détails du contact",
+    "viewSubtitle": "Résumé en lecture seule. Utilisez Modifier pour changer.",
+    "sectionIdentity": "Identité",
+    "sectionDates": "Dates",
+    "sectionFamily": "Parents",
     "nom": "Nom",
     "prenom": "Prénom",
     "email": "Email",
@@ -31,7 +38,6 @@
     "dateDecès": "Date de décès",
     "pere": "Père",
     "mere": "Mère",
-    "viewTitle": "Détails du contact",
     "edit": "Modifier",
     "save": "Enregistrer",
     "cancel": "Annuler"

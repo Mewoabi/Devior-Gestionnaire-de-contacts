@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
 import Paper from '@mui/material/Paper';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import ContactsIcon from '@mui/icons-material/Contacts';
 import ContactList from './components/ContactList';
 import ContactModal, { type ModalMode } from './components/ContactModal';
 import LanguageSwitcher from './components/LanguageSwitcher';
@@ -73,39 +73,88 @@ function App() {
     <>
       <CssBaseline />
 
-      {/* Barre de navigation principale */}
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="h1" sx={{ flexGrow: 1, letterSpacing: 0.5, fontWeight: 600 }}>
-            {t('app.title')}
-          </Typography>
-          <LanguageSwitcher />
-        </Toolbar>
-      </AppBar>
+      <Box
+        sx={{
+          height: '100dvh',
+          maxHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Barre de navigation principale */}
+        <AppBar position="static">
+          <Toolbar>
+            <Box
+              sx={{
+                flexGrow: 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+              }}
+            >
+              <ContactsIcon sx={{ opacity: 0.95, fontSize: 28 }} aria-hidden />
+              <Typography variant="h6" component="h1" sx={{ letterSpacing: 0.5, fontWeight: 600 }}>
+                {t('app.title')}
+              </Typography>
+            </Box>
+            <LanguageSwitcher />
+          </Toolbar>
+        </AppBar>
 
-      {/* Fond de page légèrement coloré */}
-      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', py: 4 }}>
-        <Container maxWidth="lg">
-          {/* Carte principale encapsulant la grille de contacts */}
-          <Paper
-            elevation={0}
+        {/* Zone principale : marge par rapport au viewport, pas de scroll page — scroll dans le DataGrid */}
+        <Box
+          component="main"
+          sx={{
+            flex: 1,
+            minHeight: 0,
+            mx: 5,
+            my: 2.5,
+            display: 'flex',
+            flexDirection: 'column',
+            bgcolor: 'background.default',
+            backgroundImage: (theme) =>
+              [
+                `radial-gradient(ellipse 80% 50% at 0% -10%, ${theme.palette.primary.main}14, transparent 55%)`,
+                `radial-gradient(ellipse 70% 45% at 100% 100%, ${theme.palette.primary.light}18, transparent 50%)`,
+              ].join(', '),
+          }}
+        >
+          <Box
             sx={{
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: 2,
-              overflow: 'hidden',
+              flex: 1,
+              minHeight: 0,
+              width: '100%',
+              maxWidth: 'xl',
+              mx: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
-            <ContactList
-              contacts={contacts}
-              onAdd={handleAdd}
-              onView={handleView}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              loading={loading}
-            />
-          </Paper>
-        </Container>
+            <Paper
+              elevation={0}
+              sx={{
+                flex: 1,
+                minHeight: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 2,
+                overflow: 'hidden',
+              }}
+            >
+              <ContactList
+                contacts={contacts}
+                onAdd={handleAdd}
+                onView={handleView}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                loading={loading}
+              />
+            </Paper>
+          </Box>
+        </Box>
       </Box>
 
       {/* Modale trimode — key change force le remontage pour garantir un état propre à chaque ouverture */}

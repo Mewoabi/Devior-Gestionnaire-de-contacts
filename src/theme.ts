@@ -21,11 +21,18 @@ export const theme = createTheme({
   },
   components: {
     MuiButton: {
+      defaultProps: {
+        disableElevation: true,
+      },
       styleOverrides: {
-        containedPrimary: {
+        root: {
+          textTransform: 'capitalize',
+          minHeight: 36,
+        },
+        contained: {
           boxShadow: 'none',
           '&:hover': {
-            boxShadow: '0 2px 8px rgba(21, 101, 192, 0.3)',
+            boxShadow: '0 2px 8px rgba(21, 101, 192, 0.28)',
           },
         },
       },
@@ -35,17 +42,43 @@ export const theme = createTheme({
         elevation: 0,
       },
       styleOverrides: {
-        root: {
-          // Légère ombre sous la barre de navigation
+        root: ({ theme }) => ({
+          background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 45%, ${theme.palette.primary.light} 100%)`,
           borderBottom: '1px solid rgba(255,255,255,0.15)',
-        },
+        }),
       },
     },
     MuiDialog: {
       styleOverrides: {
-        paper: {
+        paper: ({ theme }) => ({
           borderRadius: 12,
-        },
+          boxShadow: theme.shadows[8],
+          border: `1px solid ${theme.palette.divider}`,
+        }),
+      },
+    },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          paddingBottom: theme.spacing(1.5),
+        }),
+      },
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          paddingTop: theme.spacing(1.5),
+        }),
+      },
+    },
+    MuiDialogActions: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderTop: `1px solid ${theme.palette.divider}`,
+          padding: theme.spacing(1.5, 2.5),
+          gap: theme.spacing(1),
+        }),
       },
     },
   },

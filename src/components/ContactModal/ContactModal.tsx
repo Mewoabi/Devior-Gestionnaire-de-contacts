@@ -9,6 +9,9 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
 import type { Contact } from '../../types';
 import { validateContact } from '../../utils/validation';
 
@@ -158,6 +161,12 @@ const ContactModal: React.FC<ContactModalProps> = ({
     return t('form.addTitle');
   };
 
+  const getSubtitle = (): string => {
+    if (currentMode === 'view') return t('form.viewSubtitle');
+    if (currentMode === 'edit') return t('form.editSubtitle');
+    return t('form.addSubtitle');
+  };
+
   const isViewMode = currentMode === 'view';
   const getContactLabel = (c: Contact) => `${c.nom} ${c.prenom}`;
 
@@ -166,153 +175,211 @@ const ContactModal: React.FC<ContactModalProps> = ({
     ? contacts.filter((c) => c.id !== contact.id)
     : contacts;
 
+  const sectionTitleSx = {
+    display: 'block',
+    letterSpacing: '0.08em',
+    fontWeight: 600,
+    color: 'text.secondary',
+    mb: 1,
+  } as const;
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{getTitle()}</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      slotProps={{
+        paper: {
+          sx: (theme) => ({
+            borderTopWidth: 3,
+            borderTopStyle: 'solid',
+            borderTopColor: theme.palette.primary.main,
+            maxWidth: `min(100%, ${theme.breakpoints.values.sm}px - 40px)`,
+          }),
+        },
+      }}
+    >
+      <DialogTitle>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+          <Typography variant="h6" component="span" sx={{ fontWeight: 700, lineHeight: 1.25 }}>
+            {getTitle()}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.35 }}>
+            {getSubtitle()}
+          </Typography>
+        </Box>
+      </DialogTitle>
 
       <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 0 }}>
+          {/* Identité */}
+          <Box>
+            <Typography variant="overline" sx={sectionTitleSx}>
+              {t('form.sectionIdentity')}
+            </Typography>
+            <Grid container spacing={1.5}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label={t('form.nom')}
+                  value={form.nom}
+                  onChange={(e) => handleFieldChange('nom', e.target.value)}
+                  onBlur={() => handleBlur('nom')}
+                  error={!!getFieldError('nom')}
+                  helperText={getFieldError('nom') ? (
+                    <span role="alert">{t(getFieldError('nom')!)}</span>
+                  ) : undefined}
+                  disabled={isViewMode}
+                  fullWidth
+                  size="small"
+                  slotProps={{ htmlInput: { 'aria-label': t('form.nom') } }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label={t('form.prenom')}
+                  value={form.prenom}
+                  onChange={(e) => handleFieldChange('prenom', e.target.value)}
+                  onBlur={() => handleBlur('prenom')}
+                  error={!!getFieldError('prenom')}
+                  helperText={getFieldError('prenom') ? (
+                    <span role="alert">{t(getFieldError('prenom')!)}</span>
+                  ) : undefined}
+                  disabled={isViewMode}
+                  fullWidth
+                  size="small"
+                  slotProps={{ htmlInput: { 'aria-label': t('form.prenom') } }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  label={t('form.email')}
+                  value={form.email}
+                  onChange={(e) => handleFieldChange('email', e.target.value)}
+                  onBlur={() => handleBlur('email')}
+                  error={!!getFieldError('email')}
+                  helperText={getFieldError('email') ? (
+                    <span role="alert">{t(getFieldError('email')!)}</span>
+                  ) : undefined}
+                  disabled={isViewMode}
+                  fullWidth
+                  size="small"
+                  slotProps={{ htmlInput: { 'aria-label': t('form.email') } }}
+                />
+              </Grid>
+            </Grid>
+          </Box>
 
-          {/* Champ Nom */}
-          <TextField
-            label={t('form.nom')}
-            value={form.nom}
-            onChange={(e) => handleFieldChange('nom', e.target.value)}
-            onBlur={() => handleBlur('nom')}
-            error={!!getFieldError('nom')}
-            helperText={getFieldError('nom') ? (
-              <span role="alert">{t(getFieldError('nom')!)}</span>
-            ) : undefined}
-            disabled={isViewMode}
-            fullWidth
-            size="small"
-            slotProps={{ htmlInput: { 'aria-label': t('form.nom') } }}
-          />
+          <Divider />
 
-          {/* Champ Prénom */}
-          <TextField
-            label={t('form.prenom')}
-            value={form.prenom}
-            onChange={(e) => handleFieldChange('prenom', e.target.value)}
-            onBlur={() => handleBlur('prenom')}
-            error={!!getFieldError('prenom')}
-            helperText={getFieldError('prenom') ? (
-              <span role="alert">{t(getFieldError('prenom')!)}</span>
-            ) : undefined}
-            disabled={isViewMode}
-            fullWidth
-            size="small"
-            slotProps={{ htmlInput: { 'aria-label': t('form.prenom') } }}
-          />
+          {/* Dates */}
+          <Box>
+            <Typography variant="overline" sx={sectionTitleSx}>
+              {t('form.sectionDates')}
+            </Typography>
+            <Grid container spacing={1.5}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label={t('form.dateNaissance')}
+                  type="date"
+                  value={form.dateNaissance}
+                  onChange={(e) => handleFieldChange('dateNaissance', e.target.value)}
+                  onBlur={() => handleBlur('dateNaissance')}
+                  error={!!getFieldError('dateNaissance')}
+                  helperText={getFieldError('dateNaissance') ? (
+                    <span role="alert">{t(getFieldError('dateNaissance')!)}</span>
+                  ) : undefined}
+                  disabled={isViewMode}
+                  fullWidth
+                  size="small"
+                  slotProps={{
+                    inputLabel: { shrink: true },
+                    htmlInput: { 'aria-label': t('form.dateNaissance') },
+                  }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label={t('form.dateDecès')}
+                  type="date"
+                  value={form.dateDecès}
+                  onChange={(e) => handleFieldChange('dateDecès', e.target.value)}
+                  onBlur={() => handleBlur('dateDecès')}
+                  error={!!getFieldError('dateDecès')}
+                  helperText={getFieldError('dateDecès') ? (
+                    <span role="alert">{t(getFieldError('dateDecès')!)}</span>
+                  ) : undefined}
+                  disabled={isViewMode}
+                  fullWidth
+                  size="small"
+                  slotProps={{
+                    inputLabel: { shrink: true },
+                    htmlInput: { 'aria-label': t('form.dateDecès') },
+                  }}
+                />
+              </Grid>
+            </Grid>
+          </Box>
 
-          {/* Champ Email */}
-          <TextField
-            label={t('form.email')}
-            value={form.email}
-            onChange={(e) => handleFieldChange('email', e.target.value)}
-            onBlur={() => handleBlur('email')}
-            error={!!getFieldError('email')}
-            helperText={getFieldError('email') ? (
-              <span role="alert">{t(getFieldError('email')!)}</span>
-            ) : undefined}
-            disabled={isViewMode}
-            fullWidth
-            size="small"
-            slotProps={{ htmlInput: { 'aria-label': t('form.email') } }}
-          />
+          <Divider />
 
-          {/* Champ Date de naissance — obligatoire */}
-          <TextField
-            label={t('form.dateNaissance')}
-            type="date"
-            value={form.dateNaissance}
-            onChange={(e) => handleFieldChange('dateNaissance', e.target.value)}
-            onBlur={() => handleBlur('dateNaissance')}
-            error={!!getFieldError('dateNaissance')}
-            helperText={getFieldError('dateNaissance') ? (
-              <span role="alert">{t(getFieldError('dateNaissance')!)}</span>
-            ) : undefined}
-            disabled={isViewMode}
-            fullWidth
-            size="small"
-            slotProps={{
-              inputLabel: { shrink: true },
-              htmlInput: { 'aria-label': t('form.dateNaissance') },
-            }}
-          />
-
-          {/* Champ Date de décès — optionnel */}
-          <TextField
-            label={t('form.dateDecès')}
-            type="date"
-            value={form.dateDecès}
-            onChange={(e) => handleFieldChange('dateDecès', e.target.value)}
-            onBlur={() => handleBlur('dateDecès')}
-            error={!!getFieldError('dateDecès')}
-            helperText={getFieldError('dateDecès') ? (
-              <span role="alert">{t(getFieldError('dateDecès')!)}</span>
-            ) : undefined}
-            disabled={isViewMode}
-            fullWidth
-            size="small"
-            slotProps={{
-              inputLabel: { shrink: true },
-              htmlInput: { 'aria-label': t('form.dateDecès') },
-            }}
-          />
-
-          {/* Sélection du père via Autocomplete — le contact lui-même est exclu des options */}
-          <Autocomplete
-            options={parentOptions}
-            getOptionLabel={getContactLabel}
-            value={form.pere}
-            onChange={(_, value) => {
-              handleFieldChange('pere', value);
-              // Marque 'parents' comme touché dès qu'un parent est sélectionné pour afficher l'erreur
-              handleBlur('parents');
-            }}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            disabled={isViewMode}
-            size="small"
-            renderInput={(params) => (
-              <AutocompleteTextField
-                {...params}
-                label={t('form.pere')}
-                error={!!getFieldError('parents')}
-                helperText={getFieldError('parents') ? (
-                  <span role="alert">{t(getFieldError('parents')!)}</span>
-                ) : undefined}
-                inputProps={{ ...getAutocompleteInputProps(params), 'aria-label': t('form.pere') }}
+          {/* Parents */}
+          <Box>
+            <Typography variant="overline" sx={sectionTitleSx}>
+              {t('form.sectionFamily')}
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              <Autocomplete
+                options={parentOptions}
+                getOptionLabel={getContactLabel}
+                value={form.pere}
+                onChange={(_, value) => {
+                  handleFieldChange('pere', value);
+                  // Marque 'parents' comme touché dès qu'un parent est sélectionné pour afficher l'erreur
+                  handleBlur('parents');
+                }}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                disabled={isViewMode}
+                size="small"
+                renderInput={(params) => (
+                  <AutocompleteTextField
+                    {...params}
+                    label={t('form.pere')}
+                    error={!!getFieldError('parents')}
+                    helperText={getFieldError('parents') ? (
+                      <span role="alert">{t(getFieldError('parents')!)}</span>
+                    ) : undefined}
+                    inputProps={{ ...getAutocompleteInputProps(params), 'aria-label': t('form.pere') }}
+                  />
+                )}
               />
-            )}
-          />
 
-          {/* Sélection de la mère via Autocomplete — le contact lui-même est exclu des options */}
-          <Autocomplete
-            options={parentOptions}
-            getOptionLabel={getContactLabel}
-            value={form.mere}
-            onChange={(_, value) => {
-              handleFieldChange('mere', value);
-              // Marque 'parents' comme touché dès qu'un parent est sélectionné pour afficher l'erreur
-              handleBlur('parents');
-            }}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            disabled={isViewMode}
-            size="small"
-            renderInput={(params) => (
-              <AutocompleteTextField
-                {...params}
-                label={t('form.mere')}
-                error={!!getFieldError('parents')}
-                helperText={getFieldError('parents') ? (
-                  <span role="alert">{t(getFieldError('parents')!)}</span>
-                ) : undefined}
-                inputProps={{ ...getAutocompleteInputProps(params), 'aria-label': t('form.mere') }}
+              <Autocomplete
+                options={parentOptions}
+                getOptionLabel={getContactLabel}
+                value={form.mere}
+                onChange={(_, value) => {
+                  handleFieldChange('mere', value);
+                  // Marque 'parents' comme touché dès qu'un parent est sélectionné pour afficher l'erreur
+                  handleBlur('parents');
+                }}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                disabled={isViewMode}
+                size="small"
+                renderInput={(params) => (
+                  <AutocompleteTextField
+                    {...params}
+                    label={t('form.mere')}
+                    error={!!getFieldError('parents')}
+                    helperText={getFieldError('parents') ? (
+                      <span role="alert">{t(getFieldError('parents')!)}</span>
+                    ) : undefined}
+                    inputProps={{ ...getAutocompleteInputProps(params), 'aria-label': t('form.mere') }}
+                  />
+                )}
               />
-            )}
-          />
-
+            </Box>
+          </Box>
         </Box>
       </DialogContent>
 

@@ -172,14 +172,22 @@ const ContactList: React.FC<ContactListProps> = ({
   ];
 
   return (
-    <Box>
-      {/* Barre d'outils — bouton d'ajout aligné à droite avec espacement interne */}
+    <Box
+      sx={{
+        flex: 1,
+        minHeight: 0,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      {/* Barre d'outils — bouton d'ajout aligné à droite */}
       <Box
         sx={{
+          flexShrink: 0,
           display: 'flex',
           justifyContent: 'flex-end',
-          px: 2,
-          py: 1.5,
+          px: 5,
+          py: 2,
           borderBottom: '1px solid',
           borderColor: 'divider',
         }}
@@ -195,92 +203,93 @@ const ContactList: React.FC<ContactListProps> = ({
         </Button>
       </Box>
 
-      {/* Grille de données en lecture seule avec en-têtes colorés */}
-      <DataGrid
-        rows={contacts}
-        columns={columns}
-        loading={loading}
-        pageSizeOptions={[10, 25, 50]}
-        initialState={{
-          pagination: { paginationModel: { pageSize: 10 } },
-          columns: {
-            // Colonnes supplémentaires masquées par défaut — activables via le gestionnaire
-            columnVisibilityModel: {
-              dateNaissance: false,
-              dateDecès: false,
-              pere: false,
-              mere: false,
-            },
-          },
-        }}
-        checkboxSelection
-        localeText={dataGridLocaleText}
-        disableRowSelectionOnClick
-        autoHeight
-        sx={{
-          border: 'none',
-          borderTopRightRadius: 0,
-          borderTopLeftRadius: 0,
-          // Colonne de cases à cocher — même fond bleu que les autres en-têtes
-          '& .MuiDataGrid-columnHeaderCheckbox': {
-            backgroundColor: 'primary.main',
-            '& .MuiCheckbox-root': { color: 'rgba(255,255,255,0.8)' },
-          },
-          '& .MuiDataGrid-cellCheckbox .MuiCheckbox-root': {
-            color: 'text.secondary',
-          },
-          // En-têtes de colonnes : fond bleu primaire avec texte blanc
-          '& .MuiDataGrid-columnHeader': {
-            backgroundColor: 'primary.main',
-            color: 'primary.contrastText',
-            fontWeight: 600,
-            '& .MuiDataGrid-columnHeaderTitle': {
-              textTransform: 'uppercase',
-              fontSize: '0.75rem',
-              letterSpacing: '0.05em',
-            },
-            // Conteneur des boutons icônes (tri, menu) — fond toujours transparent sur fond bleu
-            '& .MuiDataGrid-iconButtonContainer .MuiButtonBase-root': {
-              color: 'rgba(255,255,255,0.8)',
-              backgroundColor: 'transparent',
-              '&:hover': {
-                backgroundColor: 'rgba(255,255,255,0.12)',
-                color: '#ffffff',
+      {/* Grille : hauteur fixe dans la colonne flex — scroll interne, pas de scroll page */}
+      <Box sx={{ flex: 1, minHeight: 0, width: '100%' }}>
+        <DataGrid
+          rows={contacts}
+          columns={columns}
+          loading={loading}
+          density="compact"
+          pageSizeOptions={[10, 25, 50]}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 10 } },
+            columns: {
+              // Colonnes supplémentaires masquées par défaut — activables via le gestionnaire
+              columnVisibilityModel: {
+                dateNaissance: false,
+                dateDecès: false,
+                pere: false,
+                mere: false,
               },
-              // Force l'icône SVG toujours visible dès que le bouton apparaît (corrige le cercle blanc vide)
-              '& .MuiSvgIcon-root': {
-                opacity: '1 !important',
+            },
+          }}
+          checkboxSelection
+          localeText={dataGridLocaleText}
+          disableRowSelectionOnClick
+          sx={{
+            height: '100%',
+            border: 'none',
+            borderTopRightRadius: 0,
+            borderTopLeftRadius: 0,
+            '& .MuiDataGrid-footerContainer': {
+              px: 5,
+            },
+            // Colonne de cases à cocher — même fond bleu que les autres en-têtes
+            '& .MuiDataGrid-columnHeaderCheckbox': {
+              backgroundColor: 'primary.main',
+              '& .MuiCheckbox-root': { color: 'rgba(255,255,255,0.8)' },
+            },
+            '& .MuiDataGrid-cellCheckbox .MuiCheckbox-root': {
+              color: 'text.secondary',
+            },
+            // En-têtes de colonnes : fond bleu primaire avec texte blanc
+            '& .MuiDataGrid-columnHeader': {
+              backgroundColor: 'primary.main',
+              color: 'primary.contrastText',
+              fontWeight: 600,
+              '& .MuiDataGrid-columnHeaderTitle': {
+                textTransform: 'none',
+                fontSize: '0.75rem',
+                letterSpacing: '0.04em',
+              },
+              '& .MuiDataGrid-iconButtonContainer .MuiButtonBase-root': {
                 color: 'rgba(255,255,255,0.8)',
+                backgroundColor: 'transparent',
+                '&:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.12)',
+                  color: '#ffffff',
+                },
+                '& .MuiSvgIcon-root': {
+                  opacity: '1 !important',
+                  color: 'rgba(255,255,255,0.8)',
+                },
+                '&:hover .MuiSvgIcon-root': {
+                  color: '#ffffff',
+                },
               },
-              '&:hover .MuiSvgIcon-root': {
-                color: '#ffffff',
+              '& .MuiDataGrid-menuIconButton': {
+                color: 'rgba(255,255,255,0.7)',
+                '&:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.12)',
+                  color: '#ffffff',
+                },
               },
             },
-            // Bouton menu colonne
-            '& .MuiDataGrid-menuIconButton': {
-              color: 'rgba(255,255,255,0.7)',
-              '&:hover': {
-                backgroundColor: 'rgba(255,255,255,0.12)',
-                color: '#ffffff',
-              },
-            },
-          },
           '& .MuiDataGrid-columnSeparator': {
             color: 'rgba(255,255,255,0.2)',
           },
-          // Suppression du contour bleu sur les cellules au focus
           '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
             outline: 'none',
           },
           '& .MuiDataGrid-cell:focus-within': {
             outline: 'none',
           },
-          // Survol de ligne discret
           '& .MuiDataGrid-row:hover': {
             backgroundColor: 'rgba(21, 101, 192, 0.04)',
           },
         }}
-      />
+        />
+      </Box>
     </Box>
   );
 };
