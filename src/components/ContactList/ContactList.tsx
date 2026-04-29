@@ -1,6 +1,6 @@
 // Composant principal de liste des contacts — DataGrid MUI en lecture seule
 // Actions par ligne : 👁 visualisation (ouvre la modale trimode) + 🗑 suppression
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -12,6 +12,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DataGrid, type GridColDef, type GridRenderCellParams } from '@mui/x-data-grid';
+import type { GridPaginationModel } from '@mui/x-data-grid';
 // Textes internes du DataGrid traduits selon la langue active (pagination, menus de colonnes…)
 import { frFR, enUS } from '@mui/x-data-grid/locales';
 import type { Contact } from '../../types';
@@ -38,6 +39,10 @@ const ContactList: React.FC<ContactListProps> = ({
   loading,
 }) => {
   const { t, i18n } = useTranslation();
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 10,
+  });
 
   // Sélection du texte de localisation du DataGrid selon la langue active
   const dataGridLocaleText =
@@ -62,12 +67,19 @@ const ContactList: React.FC<ContactListProps> = ({
       field: 'rowNumber',
       headerName: '#',
       type: 'number',
-      width: 72,
+      width: 84,
       editable: false,
       sortable: false,
       filterable: false,
-      renderCell: (params: GridRenderCellParams<Contact>) =>
-        params.api.getRowIndexRelativeToVisibleRows(params.id) + 1,
+      align: 'left',
+      headerAlign: 'left',
+      renderCell: (params: GridRenderCellParams<Contact>) => (
+        <Box sx={{ width: '100%', pl: 1 }}>
+          {paginationModel.page * paginationModel.pageSize +
+            params.api.getRowIndexRelativeToVisibleRows(params.id) +
+            1}
+        </Box>
+      ),
     },
     {
       field: 'nom',
@@ -201,6 +213,7 @@ const ContactList: React.FC<ContactListProps> = ({
           alignItems: 'center',
           px: 1.5,
           py: 1.5,
+          backgroundColor: 'rgba(21, 101, 192, 0.06)',
           borderBottom: '1px solid',
           borderColor: 'divider',
         }}
@@ -209,11 +222,21 @@ const ContactList: React.FC<ContactListProps> = ({
           {t('contacts.title')}
         </Typography>
         <Button
-          variant="contained"
+          variant="outlined"
+          color="primary"
           size="small"
           startIcon={<AddIcon />}
           onClick={onAdd}
-          sx={{ fontWeight: 600, px: 2.5 }}
+          sx={{
+            fontWeight: 600,
+            px: 2.5,
+            borderWidth: 1.5,
+            backgroundColor: 'rgba(21, 101, 192, 0.08)',
+            '&:hover': {
+              borderWidth: 1.5,
+              backgroundColor: 'rgba(21, 101, 192, 0.14)',
+            },
+          }}
         >
           {t('contacts.add')}
         </Button>
@@ -230,8 +253,9 @@ const ContactList: React.FC<ContactListProps> = ({
           }
           density="standard"
           pageSizeOptions={[10, 25, 50]}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
           initialState={{
-            pagination: { paginationModel: { pageSize: 10 } },
             columns: {
               // Colonnes supplémentaires masquées par défaut — activables via le gestionnaire
               columnVisibilityModel: {
@@ -254,7 +278,7 @@ const ContactList: React.FC<ContactListProps> = ({
             },
             // En-têtes de colonnes : fond bleu primaire avec texte blanc
             '& .MuiDataGrid-columnHeader': {
-              backgroundColor: 'primary.main',
+              backgroundColor: 'primary.dark',
               color: 'primary.contrastText',
               fontWeight: 600,
               '& .MuiDataGrid-columnHeaderTitle': {

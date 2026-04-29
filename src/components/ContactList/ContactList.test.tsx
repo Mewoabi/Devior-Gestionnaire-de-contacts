@@ -24,6 +24,14 @@ const mockContacts: Contact[] = [
   },
 ];
 
+const paginatedContacts: Contact[] = Array.from({ length: 12 }, (_, idx) => ({
+  id: String(idx + 1),
+  nom: `Nom${idx + 1}`,
+  prenom: `Prenom${idx + 1}`,
+  dateNaissance: new Date('1990-01-01'),
+  email: `contact${idx + 1}@email.com`,
+}));
+
 interface ContactListProps {
   contacts: Contact[];
   onAdd: () => void;
@@ -139,5 +147,21 @@ describe('ContactList', () => {
     renderContactList({ contacts: [] });
     expect(screen.getByRole('grid')).toBeInTheDocument();
     expect(screen.queryByText('Dupont')).not.toBeInTheDocument();
+  });
+
+  it('should continue # index values across pagination pages', async () => {
+    const { container } = renderContactList({ contacts: paginatedContacts });
+
+    fireEvent.click(screen.getByRole('button', { name: /page suivante|next page/i }));
+
+    const rowNumbers = Array.from(
+      container.querySelectorAll('[data-field="rowNumber"]')
+    )
+      .map((cell) => cell.textContent?.trim())
+      .filter((value): value is string => Boolean(value));
+
+    expect(rowNumbers).toContain('11');
+    expect(rowNumbers).toContain('12');
+    expect(rowNumbers).not.toContain('1');
   });
 });
