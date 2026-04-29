@@ -15,7 +15,7 @@ const contact2: Contact = {
   nom: 'Dupont',
   prenom: 'Jean',
   dateNaissance: new Date('1960-08-22'),
-  email: 'jean.dupont@email.com',
+  email: 'jean.dupont@gmail.com',
 };
 
 const contact3: Contact = {
@@ -23,7 +23,7 @@ const contact3: Contact = {
   nom: 'Martin',
   prenom: 'Sophie',
   dateNaissance: new Date('1963-11-10'),
-  email: 'sophie.martin@email.com',
+  email: 'sophie.martin@yahoo.fr',
 };
 
 // Contact décédé — illustre l'utilisation du champ dateDecès optionnel
@@ -33,7 +33,7 @@ const contact4: Contact = {
   prenom: 'Henri',
   dateNaissance: new Date('1945-07-30'),
   dateDecès: new Date('2020-01-15'),
-  email: 'henri.bernard@email.com',
+  email: 'h.bernard@orange.fr',
 };
 
 // Contacts enfants — référencent d'autres contacts comme père et mère
@@ -42,7 +42,7 @@ const contact5: Contact = {
   nom: 'Dupont',
   prenom: 'Lucas',
   dateNaissance: new Date('1990-04-05'),
-  email: 'lucas.dupont@email.com',
+  email: 'lucas.dupont@outlook.com',
   pere: contact2,
   mere: contact3,
 };
@@ -52,7 +52,7 @@ const contact6: Contact = {
   nom: 'Dupont',
   prenom: 'Emma',
   dateNaissance: new Date('1995-12-01'),
-  email: 'emma.dupont@email.com',
+  email: 'emma.d@icloud.com',
   pere: contact2,
   mere: contact3,
 };
@@ -62,7 +62,7 @@ const contact7: Contact = {
   nom: 'Nguemo',
   prenom: 'Alain',
   dateNaissance: new Date('1988-02-14'),
-  email: 'alain.nguemo@email.com',
+  email: 'alain.nguemo@hotmail.fr',
 };
 
 const contact8: Contact = {
@@ -70,7 +70,7 @@ const contact8: Contact = {
   nom: 'Nana',
   prenom: 'Brigitte',
   dateNaissance: new Date('1991-09-09'),
-  email: 'brigitte.nana@email.com',
+  email: 'b.nana@sfr.fr',
 };
 
 const contact9: Contact = {
@@ -78,7 +78,7 @@ const contact9: Contact = {
   nom: 'Kouam',
   prenom: 'Paul',
   dateNaissance: new Date('1982-04-27'),
-  email: 'paul.kouam@email.com',
+  email: 'paul.kouam@protonmail.com',
 };
 
 const contact10: Contact = {
@@ -86,7 +86,7 @@ const contact10: Contact = {
   nom: 'Mballa',
   prenom: 'Yvonne',
   dateNaissance: new Date('1998-12-19'),
-  email: 'yvonne.mballa@email.com',
+  email: 'yvonne.mballa@gmail.com',
   pere: contact9,
   mere: contact8,
 };
@@ -96,7 +96,7 @@ const contact11: Contact = {
   nom: 'Simo',
   prenom: 'Jacques',
   dateNaissance: new Date('1975-06-02'),
-  email: 'jacques.simo@email.com',
+  email: 'j.simo@laposte.net',
 };
 
 const contact12: Contact = {
@@ -104,7 +104,7 @@ const contact12: Contact = {
   nom: 'Tchoua',
   prenom: 'Mireille',
   dateNaissance: new Date('1987-03-30'),
-  email: 'mireille.tchoua@email.com',
+  email: 'mireille.tchoua@live.fr',
 };
 
 // Liste complète exportée — point d'entrée pour le mock adapter

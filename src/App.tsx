@@ -157,8 +157,9 @@ function App() {
           sx={{
             flex: 1,
             minHeight: 0,
-            mx: 5,
-            my: 2.5,
+            // Marges réduites au minimum sur mobile pour maximiser la largeur de la grille
+            mx: isMobile ? 1 : 5,
+            my: isMobile ? 1 : 2.5,
             display: 'flex',
             flexDirection: 'column',
             bgcolor: 'background.default',

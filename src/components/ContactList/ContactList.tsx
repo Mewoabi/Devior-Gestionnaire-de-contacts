@@ -2,6 +2,8 @@
 // Actions par ligne : 👁 visualisation (ouvre la modale trimode) + 🗑 suppression
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/material/styles';
+import { useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
@@ -39,6 +41,9 @@ const ContactList: React.FC<ContactListProps> = ({
   loading,
 }) => {
   const { t, i18n } = useTranslation();
+  const theme = useTheme();
+  // Détection mobile — même pattern que App.tsx pour la cohérence
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
     pageSize: 10,
@@ -67,7 +72,7 @@ const ContactList: React.FC<ContactListProps> = ({
       field: 'rowNumber',
       headerName: '#',
       type: 'number',
-      width: 84,
+      width: isMobile ? 50 : 84,
       editable: false,
       sortable: false,
       filterable: false,
@@ -84,19 +89,20 @@ const ContactList: React.FC<ContactListProps> = ({
     {
       field: 'nom',
       headerName: t('contacts.columns.nom'),
-      flex: 1,
+      // Sur mobile : largeur fixe pour éviter la troncature — le DataGrid défile horizontalement
+      ...(isMobile ? { width: 130, minWidth: 130 } : { flex: 1 }),
       editable: false,
     },
     {
       field: 'prenom',
       headerName: t('contacts.columns.prenom'),
-      flex: 1,
+      ...(isMobile ? { width: 130, minWidth: 130 } : { flex: 1 }),
       editable: false,
     },
     {
       field: 'email',
       headerName: t('contacts.columns.email'),
-      flex: 1.5,
+      ...(isMobile ? { width: 200, minWidth: 200 } : { flex: 1.5 }),
       editable: false,
     },
     // ─── Colonnes masquées par défaut — activables via le gestionnaire de colonnes ──
