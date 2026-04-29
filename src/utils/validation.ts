@@ -62,6 +62,23 @@ export const validateParents = (
   return null;
 };
 
+// ─── Unicité de l'email dans la liste (complète la règle 3) ─────────────────
+// Vide laissé vide pour que validateEmail gère le cas "email absent"
+
+export const validateUniqueEmail = (
+  email: string,
+  contacts: Contact[],
+  excludeId?: string
+): string | null => {
+  if (!email || email.trim().length === 0) return null;
+  const normalized = email.trim().toLowerCase();
+  const isDuplicate = contacts.some(
+    (c) => c.email.trim().toLowerCase() === normalized && c.id !== excludeId
+  );
+  if (isDuplicate) return 'errors.email.duplicate';
+  return null;
+};
+
 // ─── Règle 4 : nom complet (nom + prenom) unique dans la liste ───────────────
 
 export const validateUniqueName = (
@@ -100,7 +117,13 @@ export const validateContact = (
   if (prenomError) errors.prenom = prenomError;
 
   const emailError = validateEmail(data.email ?? '');
-  if (emailError) errors.email = emailError;
+  if (emailError) {
+    errors.email = emailError;
+  } else {
+    // Unicité vérifiée uniquement si le format est valide
+    const duplicateEmailError = validateUniqueEmail(data.email ?? '', contacts, excludeId);
+    if (duplicateEmailError) errors.email = duplicateEmailError;
+  }
 
   const dateNaissanceError = validateDateNaissance(data.dateNaissance ?? null);
   if (dateNaissanceError) errors.dateNaissance = dateNaissanceError;

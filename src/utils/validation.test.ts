@@ -8,6 +8,7 @@ import {
   validateDateDecès,
   validateParents,
   validateUniqueName,
+  validateUniqueEmail,
   validateContact,
 } from './validation';
 import type { Contact } from '../types';
@@ -304,5 +305,60 @@ describe('validateContact', () => {
     const errors = validateContact(data, existingContacts, '1');
 
     expect(errors.nom).toBeUndefined();
+  });
+
+  it('should include a duplicate email error when the email is already used', () => {
+    const data: Partial<Contact> = {
+      nom: 'Nouveau',
+      prenom: 'Contact',
+      dateNaissance: new Date('2000-01-01'),
+      // Email de contactA — déjà utilisé
+      email: 'jean.dupont@email.com',
+    };
+    const errors = validateContact(data, existingContacts);
+
+    expect(errors.email).toBe('errors.email.duplicate');
+  });
+
+  it('should allow the same email when excludeId matches the owner', () => {
+    const data: Partial<Contact> = {
+      nom: 'Dupont',
+      prenom: 'Jean',
+      dateNaissance: new Date('1980-01-01'),
+      email: 'jean.dupont@email.com',
+    };
+    // Le contact édite son propre e-mail — pas d'erreur de doublon
+    const errors = validateContact(data, existingContacts, '1');
+
+    expect(errors.email).toBeUndefined();
+  });
+});
+
+// ─── validateUniqueEmail : unicité de l'e-mail dans la liste ─────────────────
+describe('validateUniqueEmail', () => {
+  it('should return null when the email is not used by any other contact', () => {
+    expect(validateUniqueEmail('nouveau@email.com', existingContacts)).toBeNull();
+  });
+
+  it('should return an error key when the email is already used', () => {
+    expect(validateUniqueEmail('jean.dupont@email.com', existingContacts)).toBe(
+      'errors.email.duplicate'
+    );
+  });
+
+  it('should be case-insensitive when checking duplicates', () => {
+    expect(validateUniqueEmail('JEAN.DUPONT@EMAIL.COM', existingContacts)).toBe(
+      'errors.email.duplicate'
+    );
+  });
+
+  it('should return null when the matching contact is the one being edited (excludeId)', () => {
+    expect(
+      validateUniqueEmail('jean.dupont@email.com', existingContacts, '1')
+    ).toBeNull();
+  });
+
+  it('should return null for an empty email (handled by validateEmail)', () => {
+    expect(validateUniqueEmail('', existingContacts)).toBeNull();
   });
 });

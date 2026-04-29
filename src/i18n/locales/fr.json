@@ -52,7 +52,8 @@
     },
     "email": {
       "required": "L'email est obligatoire",
-      "invalid": "L'adresse email n'est pas valide"
+      "invalid": "L'adresse email n'est pas valide",
+      "duplicate": "Cette adresse email est déjà utilisée par un autre contact"
     },
     "dateNaissance": {
       "required": "La date de naissance est obligatoire"

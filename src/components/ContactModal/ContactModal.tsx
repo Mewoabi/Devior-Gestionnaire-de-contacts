@@ -266,7 +266,11 @@ const ContactModal: React.FC<ContactModalProps> = ({
             options={parentOptions}
             getOptionLabel={getContactLabel}
             value={form.pere}
-            onChange={(_, value) => handleFieldChange('pere', value)}
+            onChange={(_, value) => {
+              handleFieldChange('pere', value);
+              // Marque 'parents' comme touché dès qu'un parent est sélectionné pour afficher l'erreur
+              handleBlur('parents');
+            }}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             disabled={isViewMode}
             size="small"
@@ -288,7 +292,11 @@ const ContactModal: React.FC<ContactModalProps> = ({
             options={parentOptions}
             getOptionLabel={getContactLabel}
             value={form.mere}
-            onChange={(_, value) => handleFieldChange('mere', value)}
+            onChange={(_, value) => {
+              handleFieldChange('mere', value);
+              // Marque 'parents' comme touché dès qu'un parent est sélectionné pour afficher l'erreur
+              handleBlur('parents');
+            }}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             disabled={isViewMode}
             size="small"
@@ -297,6 +305,9 @@ const ContactModal: React.FC<ContactModalProps> = ({
                 {...params}
                 label={t('form.mere')}
                 error={!!getFieldError('parents')}
+                helperText={getFieldError('parents') ? (
+                  <span role="alert">{t(getFieldError('parents')!)}</span>
+                ) : undefined}
                 inputProps={{ ...getAutocompleteInputProps(params), 'aria-label': t('form.mere') }}
               />
             )}
