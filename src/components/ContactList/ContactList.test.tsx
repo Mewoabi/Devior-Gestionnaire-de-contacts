@@ -73,10 +73,10 @@ describe('ContactList', () => {
     expect(screen.getByRole('button', { name: /ajouter/i })).toBeInTheDocument();
   });
 
-  it('should render table title and column headers including ID', () => {
+  it('should render table title and column headers including # index column', () => {
     renderContactList();
     expect(screen.getByText(/liste des contacts/i)).toBeInTheDocument();
-    expect(screen.getAllByRole('columnheader', { name: /id/i }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByRole('columnheader', { name: '#' }).length).toBeGreaterThanOrEqual(1);
     // MUI DataGrid duplique les headers (sticky + virtuel) — getAllByRole évite l'erreur "multiple found"
     expect(screen.getAllByRole('columnheader', { name: /nom/i }).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByRole('columnheader', { name: /prénom/i }).length).toBeGreaterThanOrEqual(1);
@@ -90,6 +90,14 @@ describe('ContactList', () => {
     expect(screen.getByText('Jean')).toBeInTheDocument();
     expect(screen.getByText('jean.dupont@email.com')).toBeInTheDocument();
     expect(screen.getByText('Martin')).toBeInTheDocument();
+  });
+
+  it('should apply striped row classes for readability', () => {
+    const { container } = renderContactList();
+    const rows = container.querySelectorAll('.MuiDataGrid-row');
+    expect(rows.length).toBeGreaterThan(1);
+    expect(rows[0]).toHaveClass('contact-row-even');
+    expect(rows[1]).toHaveClass('contact-row-odd');
   });
 
   // ─── Bouton Ajouter ───────────────────────────────────────────────────────

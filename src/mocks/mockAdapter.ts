@@ -33,6 +33,21 @@ const hydrateDates = (data: Record<string, unknown>): Partial<Contact> => {
   } as Partial<Contact>;
 };
 
+// Réconcilie les références parentales objets dans toute la source de vérité mockée.
+// - PUT: replacement = contact mis à jour pour propager immédiatement les changements (ex: nom/prénom parent).
+// - DELETE: replacement = null pour retirer les liens vers un parent supprimé.
+// Sans cette passe globale, des enfants conserveraient des objets parent périmés malgré la mutation réussie.
+const reconcileParentReferences = (
+  list: Contact[],
+  targetId: string,
+  replacement: Contact | null
+): Contact[] =>
+  list.map((contact) => ({
+    ...contact,
+    pere: contact.pere?.id === targetId ? replacement : (contact.pere ?? null),
+    mere: contact.mere?.id === targetId ? replacement : (contact.mere ?? null),
+  }));
+
 // GET /contacts — retourne la liste complète des contacts
 mock.onGet('/contacts').reply(() => [200, contactsData]);
 
@@ -64,7 +79,8 @@ mock.onPut(/\/contacts\/(.+)/).reply((config) => {
 
   if (!found) return [404, { message: 'Contact non trouvé' }];
 
-  const updated = contactsData.find((c) => c.id === id);
+  const updated = contactsData.find((c) => c.id === id) as Contact;
+  contactsData = reconcileParentReferences(contactsData, id as string, updated);
   return [200, updated];
 });
 
@@ -76,6 +92,7 @@ mock.onDelete(/\/contacts\/(.+)/).reply((config) => {
   if (!exists) return [404, { message: 'Contact non trouvé' }];
 
   contactsData = contactsData.filter((c) => c.id !== id);
+  contactsData = reconcileParentReferences(contactsData, id as string, null);
   return [204, null];
 });
 

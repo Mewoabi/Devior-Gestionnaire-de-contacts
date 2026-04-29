@@ -11,7 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import { DataGrid, type GridColDef, type GridRenderCellParams } from '@mui/x-data-grid';
 // Textes internes du DataGrid traduits selon la langue active (pagination, menus de colonnes…)
 import { frFR, enUS } from '@mui/x-data-grid/locales';
 import type { Contact } from '../../types';
@@ -59,10 +59,15 @@ const ContactList: React.FC<ContactListProps> = ({
   // Définition des colonnes — headerName traduit via i18n, édition désactivée sur toutes
   const columns: GridColDef[] = [
     {
-      field: 'id',
-      headerName: t('contacts.columns.id'),
-      width: 90,
+      field: 'rowNumber',
+      headerName: '#',
+      type: 'number',
+      width: 72,
       editable: false,
+      sortable: false,
+      filterable: false,
+      renderCell: (params: GridRenderCellParams<Contact>) =>
+        params.api.getRowIndexRelativeToVisibleRows(params.id) + 1,
     },
     {
       field: 'nom',
@@ -220,7 +225,10 @@ const ContactList: React.FC<ContactListProps> = ({
           rows={contacts}
           columns={columns}
           loading={loading}
-          density="compact"
+          getRowClassName={(params) =>
+            params.indexRelativeToCurrentPage % 2 === 0 ? 'contact-row-even' : 'contact-row-odd'
+          }
+          density="standard"
           pageSizeOptions={[10, 25, 50]}
           initialState={{
             pagination: { paginationModel: { pageSize: 10 } },
@@ -251,8 +259,9 @@ const ContactList: React.FC<ContactListProps> = ({
               fontWeight: 600,
               '& .MuiDataGrid-columnHeaderTitle': {
                 textTransform: 'none',
-                fontSize: '0.75rem',
+                // fontSize: '1.25rem',
                 letterSpacing: '0.04em',
+                fontWeight: 700,
               },
               '& .MuiDataGrid-iconButtonContainer .MuiButtonBase-root': {
                 color: 'rgba(255,255,255,0.8)',
@@ -285,6 +294,12 @@ const ContactList: React.FC<ContactListProps> = ({
             },
             '& .MuiDataGrid-cell:focus-within': {
               outline: 'none',
+            },
+            '& .contact-row-even': {
+              backgroundColor: '#ffffff',
+            },
+            '& .contact-row-odd': {
+              backgroundColor: 'rgba(0, 0, 0, 0.02)',
             },
             '& .MuiDataGrid-row:hover': {
               backgroundColor: 'rgba(21, 101, 192, 0.04)',

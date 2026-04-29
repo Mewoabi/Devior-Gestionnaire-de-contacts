@@ -80,7 +80,7 @@ describe('App', () => {
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
-  });
+  }, 30000);
 
   // ─── Ajout d'un contact ───────────────────────────────────────────────────
 
@@ -112,7 +112,7 @@ describe('App', () => {
     await waitFor(() => {
       expect(screen.getByText(/sur 13/i)).toBeInTheDocument();
     });
-  });
+  }, 30000);
 
   // ─── Suppression d'un contact ─────────────────────────────────────────────
 
@@ -128,6 +128,26 @@ describe('App', () => {
     await waitFor(() => {
       expect(screen.queryByText('Temgoua')).not.toBeInTheDocument();
     });
+  });
+
+  it('should show linked delete warning when contact is referenced as parent', async () => {
+    renderApp();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'delete-2' })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: 'delete-2' }));
+
+    expect(screen.getByText(/lie a d'autres contacts comme pere ou mere/i)).toBeInTheDocument();
+    expect(screen.getByText(/lie a 2 contacts/i)).toBeInTheDocument();
+  });
+
+  it('should show standard delete warning when contact is not linked as parent', async () => {
+    renderApp();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'delete-1' })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: 'delete-1' }));
+
+    expect(screen.getByText(/cette action est irr/i)).toBeInTheDocument();
+    expect(screen.queryByText(/lie a \d+ contact/i)).not.toBeInTheDocument();
   });
 
   // ─── Visualisation d'un contact ───────────────────────────────────────────

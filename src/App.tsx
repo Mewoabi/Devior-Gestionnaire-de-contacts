@@ -1,5 +1,5 @@
 // Composant racine — orchestre tous les composants et la gestion d'état de l'application
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -26,7 +26,7 @@ function App() {
 
   // État de la modale — un seul composant modal gère les trois modes
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [initialMode, setInitialMode] = useState<ModalMode>('add');
   const [contactToDeleteId, setContactToDeleteId] = useState<string | null>(null);
   // Compteur incrémenté à chaque ouverture pour forcer le remontage de la modale (état propre)
@@ -34,7 +34,7 @@ function App() {
 
   // Ouvre la modale en mode ajout — formulaire vide
   const handleAdd = () => {
-    setSelectedContact(null);
+    setSelectedContactId(null);
     setInitialMode('add');
     setModalKey((k) => k + 1);
     setModalOpen(true);
@@ -42,7 +42,7 @@ function App() {
 
   // Ouvre la modale en mode visualisation avec le contact de la ligne cliquée
   const handleView = (contact: Contact) => {
-    setSelectedContact(contact);
+    setSelectedContactId(contact.id);
     setInitialMode('view');
     setModalKey((k) => k + 1);
     setModalOpen(true);
@@ -50,7 +50,7 @@ function App() {
 
   // Raccourci édition directe — ouvre la modale en mode édition sans passer par la visualisation
   const handleEdit = (contact: Contact) => {
-    setSelectedContact(contact);
+    setSelectedContactId(contact.id);
     setInitialMode('edit');
     setModalKey((k) => k + 1);
     setModalOpen(true);
@@ -72,12 +72,19 @@ function App() {
   const handleDeleteConfirm = async () => {
     if (!contactToDeleteId) return;
     await handleDelete(contactToDeleteId);
+    if (selectedContactId === contactToDeleteId) {
+      setModalOpen(false);
+      setSelectedContactId(null);
+    }
     setContactToDeleteId(null);
   };
 
   // Sauvegarde les données du formulaire :
   // si selectedContact est défini → édition, sinon → ajout
   const handleSave = async (data: Omit<Contact, 'id'>) => {
+    const selectedContact = selectedContactId
+      ? contacts.find((contact) => contact.id === selectedContactId) ?? null
+      : null;
     if (selectedContact) {
       await editContact(selectedContact.id, data);
     } else {
@@ -89,6 +96,23 @@ function App() {
   const handleClose = () => {
     setModalOpen(false);
   };
+
+  const selectedContact = useMemo(
+    () => (selectedContactId ? contacts.find((contact) => contact.id === selectedContactId) ?? null : null),
+    [contacts, selectedContactId]
+  );
+
+  const contactToDelete = useMemo(
+    () => (contactToDeleteId ? contacts.find((contact) => contact.id === contactToDeleteId) ?? null : null),
+    [contacts, contactToDeleteId]
+  );
+
+  const linkedContactsCount = useMemo(() => {
+    if (!contactToDelete) return 0;
+    return contacts.filter(
+      (contact) => contact.pere?.id === contactToDelete.id || contact.mere?.id === contactToDelete.id
+    ).length;
+  }, [contacts, contactToDelete]);
 
   return (
     <>
@@ -192,7 +216,18 @@ function App() {
       <Dialog open={!!contactToDeleteId} onClose={handleDeleteCancel}>
         <DialogTitle>{t('contacts.deleteConfirm.title')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>{t('contacts.deleteConfirm.message')}</DialogContentText>
+          {linkedContactsCount > 0 ? (
+            <>
+              <DialogContentText sx={{ color: 'error.main', fontWeight: 600, mb: 1 }}>
+                {t('contacts.deleteConfirm.linkedMessage')}
+              </DialogContentText>
+              <DialogContentText sx={{ color: 'text.secondary' }}>
+                {t('contacts.deleteConfirm.linkedCount', { count: linkedContactsCount })}
+              </DialogContentText>
+            </>
+          ) : (
+            <DialogContentText>{t('contacts.deleteConfirm.message')}</DialogContentText>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteCancel}>{t('contacts.deleteConfirm.cancel')}</Button>

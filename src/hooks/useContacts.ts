@@ -75,16 +75,37 @@ export const useContacts = (): UseContactsReturn => {
     setContacts((prev) => [...prev, created]);
   };
 
+  // Synchronise toutes les références parentales embarquées (pere/mere) après mutation d'un contact.
+  // - En édition/renommage: replacement = contact mis à jour, pour propager instantanément le nouveau snapshot parent.
+  // - En suppression: replacement = null, pour nettoyer les liens orphelins côté enfants.
+  // Cette réconciliation centralisée évite les références parent obsolètes dans la grille, la modale et l'état local.
+  const reconcileParentReferences = (
+    list: Contact[],
+    targetId: string,
+    replacement: Contact | null
+  ): Contact[] =>
+    list.map((contact) => ({
+      ...contact,
+      pere: contact.pere?.id === targetId ? replacement : (contact.pere ?? null),
+      mere: contact.mere?.id === targetId ? replacement : (contact.mere ?? null),
+    }));
+
   // Met à jour un contact existant et remplace son entrée dans l'état local
   const editContact = async (id: string, data: Partial<Contact>): Promise<void> => {
     const updated = await updateContact(id, data);
-    setContacts((prev) => prev.map((c) => (c.id === id ? updated : c)));
+    setContacts((prev) => {
+      const withUpdatedRow = prev.map((c) => (c.id === id ? updated : c));
+      return reconcileParentReferences(withUpdatedRow, id, updated);
+    });
   };
 
   // Supprime un contact et le retire de l'état local
   const removeContact = async (id: string): Promise<void> => {
     await deleteContact(id);
-    setContacts((prev) => prev.filter((c) => c.id !== id));
+    setContacts((prev) => {
+      const remaining = prev.filter((c) => c.id !== id);
+      return reconcileParentReferences(remaining, id, null);
+    });
   };
 
   return { contacts, loading, error, addContact, editContact, removeContact, refresh };

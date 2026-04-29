@@ -14,11 +14,14 @@
     "deleteConfirm": {
       "title": "Supprimer ce contact ?",
       "message": "Cette action est irr\u00e9versible. Voulez-vous continuer ?",
+      "linkedMessage": "Ce contact est lie a d'autres contacts comme pere ou mere. Le supprimer effacera ces liens parentaux.",
+      "linkedCount_one": "Lie a {{count}} contact",
+      "linkedCount_other": "Lie a {{count}} contacts",
       "cancel": "Annuler",
       "confirm": "Supprimer"
     },
     "columns": {
-      "id": "ID",
+      "index": "#",
       "nom": "Nom",
       "prenom": "Pr\u00e9nom",
       "email": "Email",

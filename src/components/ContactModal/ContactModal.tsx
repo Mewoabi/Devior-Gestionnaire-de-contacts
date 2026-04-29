@@ -1,5 +1,5 @@
 // Composant modal trimode — ajout, édition et visualisation d'un contact dans une seule fenêtre
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -182,6 +182,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
 
   const isViewMode = currentMode === 'view';
   const getContactLabel = (c: Contact) => `${c.nom} ${c.prenom}`;
+  const displayForm = isViewMode && contact ? buildFormState(contact) : form;
 
   // Exclut le contact en cours d'édition des options père/mère — un contact ne peut pas être son propre parent
   const parentOptions = contact
@@ -251,7 +252,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   label={t('form.nom')}
-                  value={form.nom}
+                  value={displayForm.nom}
                   onChange={(e) => handleFieldChange('nom', e.target.value)}
                   onBlur={() => handleBlur('nom')}
                   error={!!getFieldError('nom')}
@@ -268,7 +269,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   label={t('form.prenom')}
-                  value={form.prenom}
+                  value={displayForm.prenom}
                   onChange={(e) => handleFieldChange('prenom', e.target.value)}
                   onBlur={() => handleBlur('prenom')}
                   error={!!getFieldError('prenom')}
@@ -285,7 +286,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
               <Grid size={{ xs: 12 }}>
                 <TextField
                   label={t('form.email')}
-                  value={form.email}
+                  value={displayForm.email}
                   onChange={(e) => handleFieldChange('email', e.target.value)}
                   onBlur={() => handleBlur('email')}
                   error={!!getFieldError('email')}
@@ -313,7 +314,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
               <Grid size={{ xs: 12, sm: 6 }}>
                 <DatePicker
                   label={t('form.dateNaissance')}
-                  value={parseFormDate(form.dateNaissance)}
+                  value={parseFormDate(displayForm.dateNaissance)}
                   onChange={(value) => handleFieldChange('dateNaissance', formatPickerDate(value))}
                   disabled={isViewMode}
                   format="YYYY-MM-DD"
@@ -337,7 +338,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
               <Grid size={{ xs: 12, sm: 6 }}>
                 <DatePicker
                   label={t('form.dateDecès')}
-                  value={parseFormDate(form.dateDecès)}
+                  value={parseFormDate(displayForm.dateDecès)}
                   onChange={(value) => handleFieldChange('dateDecès', formatPickerDate(value))}
                   disabled={isViewMode}
                   format="YYYY-MM-DD"
@@ -372,7 +373,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
               <Autocomplete
                 options={parentOptions}
                 getOptionLabel={getContactLabel}
-                value={form.pere}
+                value={displayForm.pere}
                 onChange={(_, value) => {
                   handleFieldChange('pere', value);
                   // Marque 'parents' comme touché dès qu'un parent est sélectionné pour afficher l'erreur
@@ -398,7 +399,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
               <Autocomplete
                 options={parentOptions}
                 getOptionLabel={getContactLabel}
-                value={form.mere}
+                value={displayForm.mere}
                 onChange={(_, value) => {
                   handleFieldChange('mere', value);
                   // Marque 'parents' comme touché dès qu'un parent est sélectionné pour afficher l'erreur

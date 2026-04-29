@@ -119,11 +119,12 @@ contact-manager/
 - **Modifier** un contact de deux façons :
   - Via le bouton « Modifier » depuis le mode visualisation (transition en place)
   - Via l'icône ✏ directement dans la ligne du tableau (accès direct au mode édition)
-- **Supprimer** un contact avec mise à jour immédiate de la liste
+- **Supprimer** un contact avec mise à jour immédiate de la liste et nettoyage instantané des liens parentaux des contacts enfants
 
 ### Tableau de données
 - Affichage via **MUI DataGrid** en mode lecture seule (pas d'édition inline)
-- Sélection multiple par cases à cocher
+- Première colonne de présentation **`#`** (index de ligne lisible) à la place de l'identifiant technique horodaté
+- La colonne **`#`** peut être affichée/masquée via le gestionnaire de colonnes
 - Pagination configurable (10 / 25 / 50 lignes par page)
 - Tri par colonne et filtrage sur toutes les colonnes
 - **Colonnes supplémentaires masquées par défaut** — activables via le gestionnaire de colonnes (⋮) :
@@ -200,6 +201,10 @@ Cette approche réduit la duplication de code et offre une expérience utilisate
 
 Le sujet définit `pere: Contact` et `mere: Contact` sans le modificateur `?`. Rendre ces champs obligatoires créerait une impossibilité logique : pour créer le premier contact, il faudrait que son père existe déjà, qui lui-même aurait besoin d'un père, à l'infini. Les champs sont donc traités comme optionnels (`pere?: Contact | null`), ce qui est cohérent avec la règle de validation n°7 (« ils doivent être différents si les deux sont renseignés ») et avec l'interface Autocomplete qui permet de vider la sélection.
 
+### Réconciliation des références objets vs normalisation par IDs
+
+Une modélisation normalisée (`pereId` / `mereId`) simplifie souvent la synchronisation. Ici, le cadrage du task impose des champs parent de type objet `Contact`; l'implémentation reste donc volontairement en références objets. Le compromis est traité de manière concise via `reconcileParentReferences`, appelé après `PUT` et `DELETE` pour propager les changements parentaux et éviter les snapshots obsolètes dans la grille et la modale.
+
 ### Exclusion du contact édité des options Autocomplete
 
 Lorsqu'un contact est en cours d'édition, son propre identifiant est exclu des listes déroulantes père/mère. L'impossibilité est préventive (le choix n'existe pas dans la liste) plutôt que curative (message d'erreur après sélection).
@@ -207,6 +212,17 @@ Lorsqu'un contact est en cours d'édition, son propre identifiant est exclu des 
 ### Mise à jour optimiste de l'état
 
 Après chaque opération CRUD (ajout, modification, suppression), l'état local est mis à jour directement sans re-fetch complet. Cela rend l'interface réactive et évite un appel réseau redondant puisque la réponse de l'API simulée contient déjà les données finales.
+
+### Synchronisation des enregistrements liés (state synchronization)
+
+Le modèle conserve `pere` et `mere` comme objets `Contact` embarqués. Pour éviter les références parent obsolètes après une édition/suppression d'un parent, l'application exécute une réconciliation centralisée (`reconcileParentReferences`) dans :
+
+- `src/hooks/useContacts.ts` pour maintenir l'état UI synchronisé immédiatement,
+- `src/mocks/mockAdapter.ts` pour garder la source de vérité mockée cohérente.
+
+Concrètement :
+- édition d'un parent -> les références `pere`/`mere` des enfants pointent vers l'objet parent mis à jour,
+- suppression d'un parent -> les références `pere`/`mere` concernées sont mises à `null`.
 
 ### Gestion des dates JSON
 

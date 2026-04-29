@@ -14,11 +14,14 @@
     "deleteConfirm": {
       "title": "Delete contact?",
       "message": "This action is irreversible. Do you want to continue?",
+      "linkedMessage": "This contact is linked to other contacts as father or mother. Deleting it will clear those parent links.",
+      "linkedCount_one": "Linked to {{count}} contact",
+      "linkedCount_other": "Linked to {{count}} contacts",
       "cancel": "Cancel",
       "confirm": "Delete"
     },
     "columns": {
-      "id": "ID",
+      "index": "#",
       "nom": "Last Name",
       "prenom": "First Name",
       "email": "Email",

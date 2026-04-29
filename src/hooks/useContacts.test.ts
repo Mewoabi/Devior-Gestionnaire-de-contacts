@@ -112,6 +112,19 @@ describe('useContacts', () => {
     expect(result.current.contacts.length).toBe(initialCount);
   });
 
+  it('should reconcile parent object references after editing a parent contact', async () => {
+    const { result } = renderHook(() => useContacts());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.editContact('2', { nom: 'ParentRenamed' });
+    });
+
+    const child = result.current.contacts.find((c) => c.id === '5');
+    expect(child?.pere?.id).toBe('2');
+    expect(child?.pere?.nom).toBe('ParentRenamed');
+  });
+
   // ─── removeContact ────────────────────────────────────────────────────────
 
   it('should remove a contact and decrease the count', async () => {
@@ -127,6 +140,18 @@ describe('useContacts', () => {
 
     expect(result.current.contacts.length).toBe(initialCount - 1);
     expect(result.current.contacts.find((c) => c.id === target.id)).toBeUndefined();
+  });
+
+  it('should clear parent references when removing a parent contact', async () => {
+    const { result } = renderHook(() => useContacts());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.removeContact('2');
+    });
+
+    const child = result.current.contacts.find((c) => c.id === '5');
+    expect(child?.pere).toBeNull();
   });
 
   // ─── refresh ──────────────────────────────────────────────────────────────
