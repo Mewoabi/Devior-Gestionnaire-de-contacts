@@ -156,6 +156,19 @@ describe('ContactModal', () => {
     });
   });
 
+  it('should show date order validation message when date deces is before date naissance', async () => {
+    renderModal({ initialMode: 'add' });
+    const birthDateInput = screen.getAllByLabelText('Date de naissance').at(-1) as HTMLInputElement;
+    const deathDateInput = screen.getAllByLabelText('Date de décès').at(-1) as HTMLInputElement;
+
+    fireEvent.change(birthDateInput, { target: { value: '2026-04-03' } });
+    fireEvent.change(deathDateInput, { target: { value: '2026-04-01' } });
+
+    await waitFor(() => {
+      expect(screen.getByText(/date de décès.*postérieure.*naissance/i)).toBeInTheDocument();
+    });
+  });
+
   // ─── Soumission valide ─────────────────────────────────────────────────────
 
   it('should call onSave with correct data when the form is valid', async () => {

@@ -154,6 +154,12 @@ const ContactModal: React.FC<ContactModalProps> = ({
     setTouched((prev) => new Set([...prev, field]));
   };
 
+  const handleDateChange = (field: 'dateNaissance' | 'dateDecès', value: Dayjs | null) => {
+    handleFieldChange(field, formatPickerDate(value));
+    // Date comparison errors depend on both fields, so mark both as touched on any date edit.
+    setTouched((prev) => new Set([...prev, 'dateNaissance', 'dateDecès']));
+  };
+
   const handleSubmit = () => {
     if (Object.keys(currentErrors).length > 0) return;
     onSave({
@@ -315,7 +321,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
                 <DatePicker
                   label={t('form.dateNaissance')}
                   value={parseFormDate(displayForm.dateNaissance)}
-                  onChange={(value) => handleFieldChange('dateNaissance', formatPickerDate(value))}
+                  onChange={(value) => handleDateChange('dateNaissance', value)}
                   disabled={isViewMode}
                   format="YYYY-MM-DD"
                   slotProps={{
@@ -339,7 +345,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
                 <DatePicker
                   label={t('form.dateDecès')}
                   value={parseFormDate(displayForm.dateDecès)}
-                  onChange={(value) => handleFieldChange('dateDecès', formatPickerDate(value))}
+                  onChange={(value) => handleDateChange('dateDecès', value)}
                   disabled={isViewMode}
                   format="YYYY-MM-DD"
                   slotProps={{
