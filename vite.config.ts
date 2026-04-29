@@ -8,5 +8,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/setupTests.ts',
+    // Délai augmenté pour les tests d'intégration App qui rendent le DataGrid complet
+    testTimeout: 15000,
   },
 })

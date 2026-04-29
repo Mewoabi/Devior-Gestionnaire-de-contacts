@@ -14,7 +14,22 @@ const LanguageSwitcher: React.FC = () => {
   };
 
   return (
-    <FormControl size="small" sx={{ minWidth: 130 }}>
+    <FormControl
+      size="small"
+      sx={{
+        minWidth: 130,
+        // Adaptation visuelle pour l'affichage dans l'AppBar bleue
+        '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.8)' },
+        '& .MuiInputLabel-root.Mui-focused': { color: '#fff' },
+        '& .MuiOutlinedInput-root': {
+          color: '#fff',
+          '& fieldset': { borderColor: 'rgba(255,255,255,0.5)' },
+          '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.8)' },
+          '&.Mui-focused fieldset': { borderColor: '#fff' },
+        },
+        '& .MuiSvgIcon-root': { color: '#fff' },
+      }}
+    >
       <InputLabel id="language-select-label">{t('nav.language')}</InputLabel>
       <Select
         labelId="language-select-label"

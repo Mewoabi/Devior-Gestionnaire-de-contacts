@@ -185,6 +185,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             ) : undefined}
             disabled={isViewMode}
             fullWidth
+            size="small"
             slotProps={{ htmlInput: { 'aria-label': t('form.nom') } }}
           />
 
@@ -200,6 +201,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             ) : undefined}
             disabled={isViewMode}
             fullWidth
+            size="small"
             slotProps={{ htmlInput: { 'aria-label': t('form.prenom') } }}
           />
 
@@ -215,6 +217,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             ) : undefined}
             disabled={isViewMode}
             fullWidth
+            size="small"
             slotProps={{ htmlInput: { 'aria-label': t('form.email') } }}
           />
 
@@ -231,6 +234,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             ) : undefined}
             disabled={isViewMode}
             fullWidth
+            size="small"
             slotProps={{
               inputLabel: { shrink: true },
               htmlInput: { 'aria-label': t('form.dateNaissance') },
@@ -250,6 +254,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             ) : undefined}
             disabled={isViewMode}
             fullWidth
+            size="small"
             slotProps={{
               inputLabel: { shrink: true },
               htmlInput: { 'aria-label': t('form.dateDecès') },
@@ -264,6 +269,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             onChange={(_, value) => handleFieldChange('pere', value)}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             disabled={isViewMode}
+            size="small"
             renderInput={(params) => (
               <AutocompleteTextField
                 {...params}
@@ -285,6 +291,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             onChange={(_, value) => handleFieldChange('mere', value)}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             disabled={isViewMode}
+            size="small"
             renderInput={(params) => (
               <AutocompleteTextField
                 {...params}

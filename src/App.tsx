@@ -5,6 +5,7 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
+import Paper from '@mui/material/Paper';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import ContactList from './components/ContactList';
@@ -64,39 +65,50 @@ function App() {
     <>
       <CssBaseline />
 
-      {/* Barre de navigation avec titre et sélecteur de langue */}
+      {/* Barre de navigation principale */}
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="h1" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" component="h1" sx={{ flexGrow: 1, letterSpacing: 0.5, fontWeight: 600 }}>
             {t('app.title')}
           </Typography>
           <LanguageSwitcher />
         </Toolbar>
       </AppBar>
 
-      {/* Zone de contenu principale */}
-      <Container maxWidth="lg">
-        <Box sx={{ py: 3 }}>
-          <ContactList
-            contacts={contacts}
-            onAdd={handleAdd}
-            onView={handleView}
-            onDelete={handleDelete}
-            loading={loading}
-          />
+      {/* Fond de page légèrement coloré */}
+      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', py: 4 }}>
+        <Container maxWidth="lg">
+          {/* Carte principale encapsulant la grille de contacts */}
+          <Paper
+            elevation={0}
+            sx={{
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 2,
+              overflow: 'hidden',
+            }}
+          >
+            <ContactList
+              contacts={contacts}
+              onAdd={handleAdd}
+              onView={handleView}
+              onDelete={handleDelete}
+              loading={loading}
+            />
+          </Paper>
+        </Container>
+      </Box>
 
-          {/* Modale trimode — key change force le remontage pour garantir un état propre à chaque ouverture */}
-          <ContactModal
-            key={modalKey}
-            open={modalOpen}
-            onClose={handleClose}
-            onSave={handleSave}
-            contact={selectedContact}
-            contacts={contacts}
-            initialMode={initialMode}
-          />
-        </Box>
-      </Container>
+      {/* Modale trimode — key change force le remontage pour garantir un état propre à chaque ouverture */}
+      <ContactModal
+        key={modalKey}
+        open={modalOpen}
+        onClose={handleClose}
+        onSave={handleSave}
+        contact={selectedContact}
+        contacts={contacts}
+        initialMode={initialMode}
+      />
     </>
   );
 }
