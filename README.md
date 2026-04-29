@@ -116,7 +116,9 @@ contact-manager/
 ### Gestion des contacts (CRUD)
 - **Ajouter** un contact via une modale de formulaire
 - **Visualiser** les détails d'un contact en mode lecture seule
-- **Modifier** un contact directement depuis la modale de visualisation
+- **Modifier** un contact de deux façons :
+  - Via le bouton « Modifier » depuis le mode visualisation (transition en place)
+  - Via l'icône ✏ directement dans la ligne du tableau (accès direct au mode édition)
 - **Supprimer** un contact avec mise à jour immédiate de la liste
 
 ### Tableau de données
@@ -133,7 +135,7 @@ contact-manager/
 | Père | `string` — nom + prénom combinés | — |
 | Mère | `string` — nom + prénom combinés | — |
 
-- La colonne **Actions** est protégée : elle ne peut pas être masquée pour préserver l'accès aux contrôles de visualisation et suppression
+- La colonne **Actions** est protégée : elle ne peut pas être masquée pour préserver l'accès aux contrôles de visualisation, édition et suppression
 
 ### Validation des données (7 règles)
 

@@ -41,6 +41,14 @@ function App() {
     setModalOpen(true);
   };
 
+  // Raccourci édition directe — ouvre la modale en mode édition sans passer par la visualisation
+  const handleEdit = (contact: Contact) => {
+    setSelectedContact(contact);
+    setInitialMode('edit');
+    setModalKey((k) => k + 1);
+    setModalOpen(true);
+  };
+
   // Supprime le contact identifié par son id — mise à jour optimiste de l'état local
   const handleDelete = async (id: string) => {
     await removeContact(id);
@@ -92,6 +100,7 @@ function App() {
               contacts={contacts}
               onAdd={handleAdd}
               onView={handleView}
+              onEdit={handleEdit}
               onDelete={handleDelete}
               loading={loading}
             />

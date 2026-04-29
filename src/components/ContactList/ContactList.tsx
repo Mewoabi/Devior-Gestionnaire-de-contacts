@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 // Textes internes du DataGrid traduits selon la langue active (pagination, menus de colonnes…)
@@ -19,6 +20,7 @@ import type { Contact } from '../../types';
 interface ContactListProps {
   contacts: Contact[];
   onAdd: () => void;
+  onEdit: (contact: Contact) => void;
   onDelete: (id: string) => void;
   onView: (contact: Contact) => void;
   loading: boolean;
@@ -29,6 +31,7 @@ interface ContactListProps {
 const ContactList: React.FC<ContactListProps> = ({
   contacts,
   onAdd,
+  onEdit,
   onDelete,
   onView,
   loading,
@@ -123,7 +126,7 @@ const ContactList: React.FC<ContactListProps> = ({
       filterable: false,
       hideable: false,
       disableColumnMenu: true,
-      width: 120,
+      width: 150,
       align: 'center',
       headerAlign: 'center',
       // Rendu personnalisé : icône œil (visualisation) + icône poubelle (suppression)
@@ -139,6 +142,17 @@ const ContactList: React.FC<ContactListProps> = ({
                 sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
               >
                 <VisibilityIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            {/* Raccourci édition directe — ouvre la modale en mode édition sans passer par la vue */}
+            <Tooltip title={t('contacts.edit')}>
+              <IconButton
+                size="small"
+                aria-label={`edit-${contact.id}`}
+                onClick={() => onEdit(contact)}
+                sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
+              >
+                <EditIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title={t('contacts.delete')}>
