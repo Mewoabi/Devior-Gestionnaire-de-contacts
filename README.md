@@ -2,6 +2,8 @@
 
 Application web de gestion de contacts développée en **React + TypeScript** (Vite). Les données sont **mockées côté frontend** avec **axios** et **axios-mock-adapter** ; aucun backend n’est requis.
 
+Prévisualisation déployée : [https://gestionnaire-de-contacts-ct57.onrender.com/](https://gestionnaire-de-contacts-ct57.onrender.com/)
+
 Ce document est structuré pour suivre le même ordre qu’une présentation naturelle du projet : **objectif et exigences du sujet**, **mise en route**, **parcours utilisateur et règles métier**, **architecture du code**, **données et état**, **internationalisation**, **qualité logicielle**, puis **décisions de conception** (y compris les extensions au-delà du minimum demandé).
 
 ---
@@ -78,6 +80,11 @@ L’application est disponible à l’URL affichée dans le terminal (souvent `h
 - Sélecteur **Français / English** dans l’**AppBar**.
 - Changement **instantané** sans rechargement.
 - Textes du **DataGrid** (pagination, menus) alignés via les objets `localeText` MUI (`frFR` / `enUS`).
+
+### 3.6 Responsive mobile
+
+- Mise en page **responsive** (desktop/tablette/mobile), incluant l’**AppBar** et la grille.
+- Ajustements spécifiques mobile pour conserver une hiérarchie visuelle lisible (titre, icône, contrôles principaux).
 
 ---
 

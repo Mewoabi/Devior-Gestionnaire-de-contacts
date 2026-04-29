@@ -19,10 +19,14 @@ import ContactModal, { type ModalMode } from './components/ContactModal';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import { useContacts } from './hooks/useContacts';
 import type { Contact } from './types';
+import { useTheme } from '@mui/material/styles';
+import { useMediaQuery } from '@mui/material';
 
 function App() {
   const { t } = useTranslation();
   const { contacts, loading, addContact, editContact, removeContact } = useContacts();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // État de la modale — un seul composant modal gère les trois modes
   const [modalOpen, setModalOpen] = useState(false);
@@ -139,7 +143,7 @@ function App() {
               }}
             >
               <ContactsIcon sx={{ opacity: 0.95, fontSize: 28 }} aria-hidden />
-              <Typography variant="h6" component="h1" sx={{ letterSpacing: 0.5, fontWeight: 600 }}>
+              <Typography variant="h6" component="h1" sx={{ letterSpacing: 0.5, fontWeight: 600, lineHeight: isMobile ? 1 : 1.2, fontSize: isMobile ? '1rem' : '1.25rem' }}>
                 {t('app.title')}
               </Typography>
             </Box>
