@@ -10,68 +10,76 @@
     "edit": "Modifier",
     "delete": "Supprimer",
     "view": "Voir",
+    "title": "Liste des contacts",
+    "deleteConfirm": {
+      "title": "Supprimer ce contact ?",
+      "message": "Cette action est irr\u00e9versible. Voulez-vous continuer ?",
+      "cancel": "Annuler",
+      "confirm": "Supprimer"
+    },
     "columns": {
+      "id": "ID",
       "nom": "Nom",
-      "prenom": "Prénom",
+      "prenom": "Pr\u00e9nom",
       "email": "Email",
       "dateNaissance": "Date de naissance",
-      "dateDecès": "Date de décès",
-      "pere": "Père",
-      "mere": "Mère",
+      "dateDec\u00e8s": "Date de d\u00e9c\u00e8s",
+      "pere": "P\u00e8re",
+      "mere": "M\u00e8re",
       "actions": "Actions"
     }
   },
   "form": {
     "addTitle": "Ajouter un contact",
-    "addSubtitle": "Saisissez l'identité, les dates et les parents éventuels.",
+    "addSubtitle": "Saisissez l'identit\u00e9, les dates et les parents \u00e9ventuels.",
     "editTitle": "Modifier le contact",
     "editSubtitle": "Modifiez les champs ci-dessous, puis enregistrez.",
-    "viewTitle": "Détails du contact",
-    "viewSubtitle": "Résumé en lecture seule. Utilisez Modifier pour changer.",
-    "sectionIdentity": "Identité",
+    "viewTitle": "D\u00e9tails du contact",
+    "viewSubtitle": "R\u00e9sum\u00e9 en lecture seule. Utilisez Modifier pour changer.",
+    "sectionIdentity": "Identit\u00e9",
     "sectionDates": "Dates",
     "sectionFamily": "Parents",
     "nom": "Nom",
-    "prenom": "Prénom",
+    "prenom": "Pr\u00e9nom",
     "email": "Email",
     "dateNaissance": "Date de naissance",
-    "dateDecès": "Date de décès",
-    "pere": "Père",
-    "mere": "Mère",
+    "dateDec\u00e8s": "Date de d\u00e9c\u00e8s",
+    "pere": "P\u00e8re",
+    "mere": "M\u00e8re",
     "edit": "Modifier",
     "save": "Enregistrer",
     "cancel": "Annuler"
   },
   "details": {
-    "title": "Détails du contact",
+    "title": "D\u00e9tails du contact",
     "close": "Fermer",
-    "noParent": "Non renseigné"
+    "noParent": "Non renseign\u00e9"
   },
   "errors": {
     "nom": {
       "required": "Le nom est obligatoire",
-      "minLength": "Le nom doit avoir au moins 3 caractères"
+      "minLength": "Le nom doit avoir au moins 3 caract\u00e8res"
     },
     "prenom": {
-      "required": "Le prénom est obligatoire",
-      "minLength": "Le prénom doit avoir au moins 3 caractères"
+      "required": "Le pr\u00e9nom est obligatoire",
+      "minLength": "Le pr\u00e9nom doit avoir au moins 3 caract\u00e8res"
     },
     "email": {
       "required": "L'email est obligatoire",
       "invalid": "L'adresse email n'est pas valide",
-      "duplicate": "Cette adresse email est déjà utilisée par un autre contact"
+      "duplicate": "Cette adresse email est d\u00e9j\u00e0 utilis\u00e9e par un autre contact"
     },
     "dateNaissance": {
       "required": "La date de naissance est obligatoire"
     },
-    "dateDecès": {
-      "beforeNaissance": "La date de décès doit être postérieure à la date de naissance"
+    "dateDec\u00e8s": {
+      "beforeNaissance": "La date de d\u00e9c\u00e8s doit \u00eatre post\u00e9rieure \u00e0 la date de naissance"
     },
     "parents": {
-      "identical": "Le père et la mère doivent être des contacts différents"
+      "identical": "Le p\u00e8re et la m\u00e8re doivent \u00eatre des contacts diff\u00e9rents"
     },
     "name": {
-      "duplicate": "Ce nom existe déjà dans la liste des contacts"
+      "duplicate": "Ce nom existe d\u00e9j\u00e0 dans la liste des contacts"
     }
   }
 }

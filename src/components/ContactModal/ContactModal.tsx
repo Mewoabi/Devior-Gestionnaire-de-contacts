@@ -8,10 +8,12 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import dayjs, { type Dayjs } from 'dayjs';
 import type { Contact } from '../../types';
 import { validateContact } from '../../utils/validation';
 
@@ -88,6 +90,17 @@ const getAutocompleteInputProps = (
   return (
     (params as { inputProps?: React.InputHTMLAttributes<HTMLInputElement> }).inputProps ?? {}
   );
+};
+
+const parseFormDate = (value: string): Dayjs | null => {
+  if (!value) return null;
+  const parsed = dayjs(value);
+  return parsed.isValid() ? parsed : null;
+};
+
+const formatPickerDate = (value: Dayjs | null): string => {
+  if (!value || !value.isValid()) return '';
+  return value.format('YYYY-MM-DD');
 };
 
 // ─── Composant ───────────────────────────────────────────────────────────────
@@ -183,6 +196,22 @@ const ContactModal: React.FC<ContactModalProps> = ({
     mb: 1,
   } as const;
 
+  const disabledFieldSx = isViewMode
+    ? {
+        '& .MuiInputBase-input.Mui-disabled': {
+          WebkitTextFillColor: 'rgba(0, 0, 0, 0.87)',
+          color: 'rgba(0, 0, 0, 0.87)',
+        },
+        '& .MuiPickersSectionList-sectionContent[aria-disabled="true"]': {
+          WebkitTextFillColor: 'rgba(0, 0, 0, 0.87)',
+          color: 'rgba(0, 0, 0, 0.87)',
+        },
+        '& .MuiPickersInputBase-sectionsContainer': {
+          color: 'rgba(0, 0, 0, 0.87)',
+        },
+      }
+    : undefined;
+
   return (
     <Dialog
       open={open}
@@ -233,6 +262,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
                   fullWidth
                   size="small"
                   slotProps={{ htmlInput: { 'aria-label': t('form.nom') } }}
+                  sx={disabledFieldSx}
                 />
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
@@ -249,6 +279,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
                   fullWidth
                   size="small"
                   slotProps={{ htmlInput: { 'aria-label': t('form.prenom') } }}
+                  sx={disabledFieldSx}
                 />
               </Grid>
               <Grid size={{ xs: 12 }}>
@@ -265,6 +296,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
                   fullWidth
                   size="small"
                   slotProps={{ htmlInput: { 'aria-label': t('form.email') } }}
+                  sx={disabledFieldSx}
                 />
               </Grid>
             </Grid>
@@ -279,42 +311,50 @@ const ContactModal: React.FC<ContactModalProps> = ({
             </Typography>
             <Grid container spacing={1.5}>
               <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
+                <DatePicker
                   label={t('form.dateNaissance')}
-                  type="date"
-                  value={form.dateNaissance}
-                  onChange={(e) => handleFieldChange('dateNaissance', e.target.value)}
-                  onBlur={() => handleBlur('dateNaissance')}
-                  error={!!getFieldError('dateNaissance')}
-                  helperText={getFieldError('dateNaissance') ? (
-                    <span role="alert">{t(getFieldError('dateNaissance')!)}</span>
-                  ) : undefined}
+                  value={parseFormDate(form.dateNaissance)}
+                  onChange={(value) => handleFieldChange('dateNaissance', formatPickerDate(value))}
                   disabled={isViewMode}
-                  fullWidth
-                  size="small"
+                  format="YYYY-MM-DD"
                   slotProps={{
-                    inputLabel: { shrink: true },
-                    htmlInput: { 'aria-label': t('form.dateNaissance') },
+                    textField: {
+                      fullWidth: true,
+                      size: 'small',
+                      onBlur: () => handleBlur('dateNaissance'),
+                      error: !!getFieldError('dateNaissance'),
+                      helperText: getFieldError('dateNaissance') ? (
+                        <span role="alert">{t(getFieldError('dateNaissance')!)}</span>
+                      ) : undefined,
+                      slotProps: {
+                        htmlInput: { 'aria-label': t('form.dateNaissance') },
+                      },
+                      sx: disabledFieldSx,
+                    },
                   }}
                 />
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
+                <DatePicker
                   label={t('form.dateDecès')}
-                  type="date"
-                  value={form.dateDecès}
-                  onChange={(e) => handleFieldChange('dateDecès', e.target.value)}
-                  onBlur={() => handleBlur('dateDecès')}
-                  error={!!getFieldError('dateDecès')}
-                  helperText={getFieldError('dateDecès') ? (
-                    <span role="alert">{t(getFieldError('dateDecès')!)}</span>
-                  ) : undefined}
+                  value={parseFormDate(form.dateDecès)}
+                  onChange={(value) => handleFieldChange('dateDecès', formatPickerDate(value))}
                   disabled={isViewMode}
-                  fullWidth
-                  size="small"
+                  format="YYYY-MM-DD"
                   slotProps={{
-                    inputLabel: { shrink: true },
-                    htmlInput: { 'aria-label': t('form.dateDecès') },
+                    textField: {
+                      fullWidth: true,
+                      size: 'small',
+                      onBlur: () => handleBlur('dateDecès'),
+                      error: !!getFieldError('dateDecès'),
+                      helperText: getFieldError('dateDecès') ? (
+                        <span role="alert">{t(getFieldError('dateDecès')!)}</span>
+                      ) : undefined,
+                      slotProps: {
+                        htmlInput: { 'aria-label': t('form.dateDecès') },
+                      },
+                      sx: disabledFieldSx,
+                    },
                   }}
                 />
               </Grid>
@@ -350,6 +390,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
                       <span role="alert">{t(getFieldError('parents')!)}</span>
                     ) : undefined}
                     inputProps={{ ...getAutocompleteInputProps(params), 'aria-label': t('form.pere') }}
+                    sx={disabledFieldSx}
                   />
                 )}
               />
@@ -375,6 +416,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
                       <span role="alert">{t(getFieldError('parents')!)}</span>
                     ) : undefined}
                     inputProps={{ ...getAutocompleteInputProps(params), 'aria-label': t('form.mere') }}
+                    sx={disabledFieldSx}
                   />
                 )}
               />

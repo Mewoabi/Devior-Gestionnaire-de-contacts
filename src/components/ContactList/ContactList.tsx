@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
@@ -57,6 +58,12 @@ const ContactList: React.FC<ContactListProps> = ({
 
   // Définition des colonnes — headerName traduit via i18n, édition désactivée sur toutes
   const columns: GridColDef[] = [
+    {
+      field: 'id',
+      headerName: t('contacts.columns.id'),
+      width: 90,
+      editable: false,
+    },
     {
       field: 'nom',
       headerName: t('contacts.columns.nom'),
@@ -185,13 +192,17 @@ const ContactList: React.FC<ContactListProps> = ({
         sx={{
           flexShrink: 0,
           display: 'flex',
-          justifyContent: 'flex-end',
-          px: 5,
-          py: 2,
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          px: 1.5,
+          py: 1.5,
           borderBottom: '1px solid',
           borderColor: 'divider',
         }}
       >
+        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          {t('contacts.title')}
+        </Typography>
         <Button
           variant="contained"
           size="small"
@@ -223,7 +234,6 @@ const ContactList: React.FC<ContactListProps> = ({
               },
             },
           }}
-          checkboxSelection
           localeText={dataGridLocaleText}
           disableRowSelectionOnClick
           sx={{
@@ -233,14 +243,6 @@ const ContactList: React.FC<ContactListProps> = ({
             borderTopLeftRadius: 0,
             '& .MuiDataGrid-footerContainer': {
               px: 5,
-            },
-            // Colonne de cases à cocher — même fond bleu que les autres en-têtes
-            '& .MuiDataGrid-columnHeaderCheckbox': {
-              backgroundColor: 'primary.main',
-              '& .MuiCheckbox-root': { color: 'rgba(255,255,255,0.8)' },
-            },
-            '& .MuiDataGrid-cellCheckbox .MuiCheckbox-root': {
-              color: 'text.secondary',
             },
             // En-têtes de colonnes : fond bleu primaire avec texte blanc
             '& .MuiDataGrid-columnHeader': {
@@ -275,19 +277,19 @@ const ContactList: React.FC<ContactListProps> = ({
                 },
               },
             },
-          '& .MuiDataGrid-columnSeparator': {
-            color: 'rgba(255,255,255,0.2)',
-          },
-          '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
-            outline: 'none',
-          },
-          '& .MuiDataGrid-cell:focus-within': {
-            outline: 'none',
-          },
-          '& .MuiDataGrid-row:hover': {
-            backgroundColor: 'rgba(21, 101, 192, 0.04)',
-          },
-        }}
+            '& .MuiDataGrid-columnSeparator': {
+              color: 'rgba(255,255,255,0.2)',
+            },
+            '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
+              outline: 'none',
+            },
+            '& .MuiDataGrid-cell:focus-within': {
+              outline: 'none',
+            },
+            '& .MuiDataGrid-row:hover': {
+              backgroundColor: 'rgba(21, 101, 192, 0.04)',
+            },
+          }}
         />
       </Box>
     </Box>

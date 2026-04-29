@@ -2,6 +2,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import i18n from './i18n';
 import App from './App';
 import { resetMockData } from './mocks/mockAdapter';
@@ -9,9 +11,11 @@ import { resetMockData } from './mocks/mockAdapter';
 // Rendu de l'application entière avec le fournisseur i18n
 const renderApp = () =>
   render(
-    <I18nextProvider i18n={i18n}>
-      <App />
-    </I18nextProvider>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>
+    </LocalizationProvider>
   );
 
 describe('App', () => {
@@ -91,7 +95,8 @@ describe('App', () => {
     fireEvent.change(screen.getByLabelText('Nom'), { target: { value: 'Moreau' } });
     fireEvent.change(screen.getByLabelText('Prénom'), { target: { value: 'Claire' } });
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'claire.moreau@email.com' } });
-    fireEvent.change(screen.getByLabelText('Date de naissance'), { target: { value: '1990-05-12' } });
+    const birthDateInput = screen.getAllByLabelText('Date de naissance').at(-1) as HTMLInputElement;
+    fireEvent.change(birthDateInput, { target: { value: '1990-05-12' } });
 
     // Attendre que le bouton soit activé (toutes les validations passées)
     await waitFor(() => {
@@ -100,23 +105,25 @@ describe('App', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /enregistrer/i }));
 
-    // La modale doit se fermer et le nouveau contact apparaître dans la grille
+    // La modale doit se fermer et le total doit augmenter
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
     await waitFor(() => {
-      expect(screen.getByText('Moreau')).toBeInTheDocument();
+      expect(screen.getByText(/sur 13/i)).toBeInTheDocument();
     });
   });
 
   // ─── Suppression d'un contact ─────────────────────────────────────────────
 
-  it('should remove a contact from the list when the delete icon is clicked', async () => {
+  it('should remove a contact after delete confirmation', async () => {
     renderApp();
     // Attente de l'affichage du contact avant la suppression
     await waitFor(() => expect(screen.getByText('Temgoua')).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: 'delete-1' }));
+    expect(screen.getByText(/supprimer ce contact/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /supprimer/i }));
 
     await waitFor(() => {
       expect(screen.queryByText('Temgoua')).not.toBeInTheDocument();

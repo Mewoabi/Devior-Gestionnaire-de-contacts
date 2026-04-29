@@ -4,9 +4,15 @@ import { useTranslation } from 'react-i18next';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import Paper from '@mui/material/Paper';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import ContactsIcon from '@mui/icons-material/Contacts';
 import ContactList from './components/ContactList';
 import ContactModal, { type ModalMode } from './components/ContactModal';
@@ -22,6 +28,7 @@ function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [initialMode, setInitialMode] = useState<ModalMode>('add');
+  const [contactToDeleteId, setContactToDeleteId] = useState<string | null>(null);
   // Compteur incrémenté à chaque ouverture pour forcer le remontage de la modale (état propre)
   const [modalKey, setModalKey] = useState(0);
 
@@ -52,6 +59,20 @@ function App() {
   // Supprime le contact identifié par son id — mise à jour optimiste de l'état local
   const handleDelete = async (id: string) => {
     await removeContact(id);
+  };
+
+  const handleDeleteRequest = (id: string) => {
+    setContactToDeleteId(id);
+  };
+
+  const handleDeleteCancel = () => {
+    setContactToDeleteId(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!contactToDeleteId) return;
+    await handleDelete(contactToDeleteId);
+    setContactToDeleteId(null);
   };
 
   // Sauvegarde les données du formulaire :
@@ -149,7 +170,7 @@ function App() {
                 onAdd={handleAdd}
                 onView={handleView}
                 onEdit={handleEdit}
-                onDelete={handleDelete}
+                onDelete={handleDeleteRequest}
                 loading={loading}
               />
             </Paper>
@@ -167,6 +188,19 @@ function App() {
         contacts={contacts}
         initialMode={initialMode}
       />
+
+      <Dialog open={!!contactToDeleteId} onClose={handleDeleteCancel}>
+        <DialogTitle>{t('contacts.deleteConfirm.title')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{t('contacts.deleteConfirm.message')}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel}>{t('contacts.deleteConfirm.cancel')}</Button>
+          <Button color="error" variant="contained" onClick={handleDeleteConfirm}>
+            {t('contacts.deleteConfirm.confirm')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

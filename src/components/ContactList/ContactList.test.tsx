@@ -73,8 +73,10 @@ describe('ContactList', () => {
     expect(screen.getByRole('button', { name: /ajouter/i })).toBeInTheDocument();
   });
 
-  it('should render column headers for nom, prenom, email and actions', () => {
+  it('should render table title and column headers including ID', () => {
     renderContactList();
+    expect(screen.getByText(/liste des contacts/i)).toBeInTheDocument();
+    expect(screen.getAllByRole('columnheader', { name: /id/i }).length).toBeGreaterThanOrEqual(1);
     // MUI DataGrid duplique les headers (sticky + virtuel) — getAllByRole évite l'erreur "multiple found"
     expect(screen.getAllByRole('columnheader', { name: /nom/i }).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByRole('columnheader', { name: /prénom/i }).length).toBeGreaterThanOrEqual(1);

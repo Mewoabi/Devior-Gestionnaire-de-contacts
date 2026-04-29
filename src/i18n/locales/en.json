@@ -10,7 +10,15 @@
     "edit": "Edit",
     "delete": "Delete",
     "view": "View",
+    "title": "Contact list",
+    "deleteConfirm": {
+      "title": "Delete contact?",
+      "message": "This action is irreversible. Do you want to continue?",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
     "columns": {
+      "id": "ID",
       "nom": "Last Name",
       "prenom": "First Name",
       "email": "Email",

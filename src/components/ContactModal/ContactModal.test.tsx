@@ -2,6 +2,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import i18n from '../../i18n';
 import ContactModal from './ContactModal';
 import type { Contact } from '../../types';
@@ -57,9 +59,11 @@ const renderModal = (overrides: Partial<ContactModalProps> = {}) => {
 
   return {
     ...render(
-      <I18nextProvider i18n={i18n}>
-        <ContactModal {...props} />
-      </I18nextProvider>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <I18nextProvider i18n={i18n}>
+          <ContactModal {...props} />
+        </I18nextProvider>
+      </LocalizationProvider>
     ),
     props,
   };
@@ -98,7 +102,7 @@ describe('ContactModal', () => {
     expect(screen.getByLabelText('Nom')).toBeInTheDocument();
     expect(screen.getByLabelText('Prénom')).toBeInTheDocument();
     expect(screen.getByLabelText('Email')).toBeInTheDocument();
-    expect(screen.getByLabelText('Date de naissance')).toBeInTheDocument();
+    expect(screen.getAllByLabelText('Date de naissance').length).toBeGreaterThan(0);
   });
 
   it('should render the Save and Cancel buttons in add mode', () => {
@@ -160,7 +164,8 @@ describe('ContactModal', () => {
     fireEvent.change(screen.getByLabelText('Nom'), { target: { value: 'Moreau' } });
     fireEvent.change(screen.getByLabelText('Prénom'), { target: { value: 'Lucas' } });
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'lucas.moreau@email.com' } });
-    fireEvent.change(screen.getByLabelText('Date de naissance'), { target: { value: '1995-03-10' } });
+    const birthDateInput = screen.getAllByLabelText('Date de naissance').at(-1) as HTMLInputElement;
+    fireEvent.change(birthDateInput, { target: { value: '1995-03-10' } });
 
     fireEvent.click(screen.getByRole('button', { name: /enregistrer/i }));
 

@@ -57,6 +57,56 @@ const contact6: Contact = {
   mere: contact3,
 };
 
+const contact7: Contact = {
+  id: '7',
+  nom: 'Nguemo',
+  prenom: 'Alain',
+  dateNaissance: new Date('1988-02-14'),
+  email: 'alain.nguemo@email.com',
+};
+
+const contact8: Contact = {
+  id: '8',
+  nom: 'Nana',
+  prenom: 'Brigitte',
+  dateNaissance: new Date('1991-09-09'),
+  email: 'brigitte.nana@email.com',
+};
+
+const contact9: Contact = {
+  id: '9',
+  nom: 'Kouam',
+  prenom: 'Paul',
+  dateNaissance: new Date('1982-04-27'),
+  email: 'paul.kouam@email.com',
+};
+
+const contact10: Contact = {
+  id: '10',
+  nom: 'Mballa',
+  prenom: 'Yvonne',
+  dateNaissance: new Date('1998-12-19'),
+  email: 'yvonne.mballa@email.com',
+  pere: contact9,
+  mere: contact8,
+};
+
+const contact11: Contact = {
+  id: '11',
+  nom: 'Simo',
+  prenom: 'Jacques',
+  dateNaissance: new Date('1975-06-02'),
+  email: 'jacques.simo@email.com',
+};
+
+const contact12: Contact = {
+  id: '12',
+  nom: 'Tchoua',
+  prenom: 'Mireille',
+  dateNaissance: new Date('1987-03-30'),
+  email: 'mireille.tchoua@email.com',
+};
+
 // Liste complète exportée — point d'entrée pour le mock adapter
 export const initialContacts: Contact[] = [
   contact1,
@@ -65,4 +115,10 @@ export const initialContacts: Contact[] = [
   contact4,
   contact5,
   contact6,
+  contact7,
+  contact8,
+  contact9,
+  contact10,
+  contact11,
+  contact12,
 ];
